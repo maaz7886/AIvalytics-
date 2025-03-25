@@ -7,10 +7,10 @@ import StudentDashboard from './student/page'
 function page() {
   return (
     <div>
-      {/* <Dashboard/> */}
+      <Dashboard/>
       {/* <LoginPage/> */}
 
-      <StudentDashboard />
+      {/* <StudentDashboard /> */}
     </div>
   )
 }
