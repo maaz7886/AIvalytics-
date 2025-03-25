@@ -62,7 +62,7 @@ export default function Register() {
       if (response.error) {
         setServerError(response.message);
       } else {
-        router.push("/register/confirmation");
+        router.push("/login");
       }
     } catch (error) {
       setServerError("An unexpected error occurred. Please try again.");
