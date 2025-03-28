@@ -1,10 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Search, RefreshCw, Trophy, BookOpen, Clock, CheckCircle, TrendingUp } from "lucide-react"
+import { Search, RefreshCw, Trophy, BookOpen, Clock, CheckCircle, TrendingUp, X } from "lucide-react"
 import TopNavBar from "@/components/students_compo/TopNavBar"
 import StatsCards from "@/components/students_compo/StatsCards"
 import CompletedTest from "@/components/students_compo/CompletedTest"
+import Test from "@/app/student/test"
 
 // Define types for our data
 type Test = {
@@ -30,6 +31,12 @@ export default function StudentDashboard() {
   const [filteredTests, setFilteredTests] = useState<Test[]>([])
   const [completedTests, setCompletedTests] = useState<Test[]>([])
   const [leaderboard, setLeaderboard] = useState<Student[]>([])
+  const [showPreview, setShowPreview] = useState(false)
+
+
+
+
+
 
   // State for search and filters
   const [searchQuery, setSearchQuery] = useState("")
@@ -113,6 +120,10 @@ export default function StudentDashboard() {
       setLoading(false)
     }, 1000)
   }
+
+  const togglePreview = () => {
+    setShowPreview(!showPreview)
+}
 
   // Function to get unique subjects for filter dropdown
   const getUniqueSubjects = () => {
@@ -260,7 +271,9 @@ export default function StudentDashboard() {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <button className="bg-emerald-500 hover:bg-emerald-600 text-white py-1 px-4 rounded">
+                          <button
+                          onClick={()=>togglePreview()}
+                          className="bg-emerald-500 hover:bg-emerald-600 text-white py-1 px-4 rounded">
                             Start Test
                           </button>
                         </td>
@@ -347,6 +360,32 @@ export default function StudentDashboard() {
           </button>
         </div>
       </main>
+       {/* Preview Modal */}
+                  {showPreview && (
+                      <div
+                          className="fixed inset-0 bg-transparent backdrop-blur-md  flex items-center justify-center z-50 p-4">
+                          <div className="bg-white rounded-l border   shadow-lg w-full max-w-4xl max-h-[90vh] overflow-auto">
+                              <div className="flex  justify-between items-center p-4 border-b border-gray-300-b">
+                                  <h2 className="text-xl font-bold">Test </h2>
+                                  <button onClick={togglePreview} className="text-gray-500 hover:text-gray-700">
+                                      <X className="w-6 h-6" />
+                                  </button>
+                              </div>
+                              <div className="p-6">
+                                  <Test
+                                      testTitle={ "Untitled Test"}
+                                      topic={"topic"}
+                                    
+                                  />
+                              </div>
+                              <div className="p-4 border-t border-gray-300-t flex justify-end">
+                                  <button onClick={togglePreview} className="px-4 py-2  border border-gray-400 rounded hover:bg-gray-200 transition">
+                                      Close Preview
+                                  </button>
+                              </div>
+                          </div>
+                      </div>
+                  )}
     </div>
   )
 }

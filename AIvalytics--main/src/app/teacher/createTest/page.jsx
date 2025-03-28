@@ -19,7 +19,32 @@ export default function MCQGenerator() {
     const [randomizeQuestions, setRandomizeQuestions] = useState(false)
 
 
-    const [mcqs, setMcqs] = useState([])
+    const [mcqs, setMcqs] = useState([ 
+        {
+        "id": "95062",
+        "question": "An example of a task an LLM could perform is:",
+        "options": [
+            "Recognizing faces in a photograph",
+            "Playing a game of chess",
+            "Summarizing a news article",
+            "Driving a car"
+        ],
+        "correctAnswer": "Summarizing a news article",
+        "explanation": "Text summarization is a common task for LLMs."
+    },
+        {
+        "id": "95062",
+        "question": "An example of a task an LLM could perform is:",
+        "options": [
+            "Recognizing faces in a photograph",
+            "Playing a game of chess",
+            "Summarizing a news article",
+            "Driving a car"
+        ],
+        "correctAnswer": "Summarizing a news article",
+        "explanation": "Text summarization is a common task for LLMs."
+    },
+])
     const [loading, setLoading] = useState(false)
     const [showPreview, setShowPreview] = useState(false)
 
@@ -80,15 +105,10 @@ export default function MCQGenerator() {
 
     const saveTest = () => {
         // Implement save functionality
-        console.log("Saving test:", {
-            testTitle,
-            subject,
-            topic,
-            difficulty,
-            randomizeQuestions,
+        router.push('/teacher/publishTest')
 
-            mcqs,
-        })
+        // Save MCQs to local storage for now
+        localStorage.setItem('mcqs', JSON.stringify(mcqs));
     }
 
     const togglePreview = () => {
@@ -206,7 +226,7 @@ export default function MCQGenerator() {
                                 Preview
                             </button>
                             <button
-                                onClick={() => router.push('/teacher/publishTest')}
+                                onClick={() => saveTest()}
                                 className="px-4 py-2 bg-emerald-500 text-white rounded hover:bg-emerald-600 transition"
                             >
                                 Publish Test
