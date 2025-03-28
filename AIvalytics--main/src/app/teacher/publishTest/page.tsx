@@ -2,12 +2,23 @@
 
 import { useState, useEffect } from "react"
 import { ArrowLeft, Search, Eye, Image } from "lucide-react"
+import { json } from "stream/consumers"
+import { supabase } from "@/lib/supabase/client"
 
 export default function PublishQuizPage() {
   // State for tracking selected classes and students
   const [selectedClasses, setSelectedClasses] = useState<string[]>(["CS101", "MATH202"])
   const [selectedStudents, setSelectedStudents] = useState<string[]>([])
   const [allStudentsSelected, setAllStudentsSelected] = useState(false)
+// Retrieve MCQs from localStorage
+const [mcqs, setMcqs] = useState(() => {[]});
+useEffect(() => { 
+  const storedMcqs = localStorage.getItem("mcqs");
+  if (storedMcqs) {
+    setMcqs(JSON.parse(storedMcqs));
+  }
+ 
+}, []);
 
   // Search state
   const [classSearchTerm, setClassSearchTerm] = useState("")
@@ -346,7 +357,17 @@ export default function PublishQuizPage() {
         </div>
         <div className="flex space-x-3">
           <button className="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50">Cancel</button>
-          <button className="px-4 py-2 bg-emerald-500 text-white rounded-md hover:bg-emerald-600">Publish Test</button>
+          <button 
+          onClick={async() => {
+            const { data, error } = await supabase
+  .from('questions')
+  .insert(mcqs)
+  .select() // Returns all inserted records
+            console.log('====================================');
+            console.log(data);
+            console.log('====================================');
+}}
+          className="px-4 py-2 bg-emerald-500 text-white rounded-md hover:bg-emerald-600">Publish Test</button>
         </div>
       </footer>
     </div>

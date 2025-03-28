@@ -8,10 +8,10 @@ import WelcomePage from './authentication/page'
 function page() {
   return (
     <div>
-      <Dashboard/>
+      {/* <Dashboard/> */}
       {/* <WelcomePage/> */}
 
-      {/* <StudentDashboard /> */}
+      <StudentDashboard />
     </div>
   )
 }

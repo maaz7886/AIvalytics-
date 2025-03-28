@@ -2,39 +2,106 @@
 
 import { useState, useEffect } from "react"
 import { CheckCircle, XCircle } from "lucide-react"
+import { supabase } from "@/lib/supabase/client"
 
-export default function TestPreview({
+export default function Test({
   testTitle,
-  subject,
-  topic,
-  difficulty,
-  questions,
-  randomizeQuestions,
-  
+  topic
 }) {
+
+  
   const [selectedAnswers, setSelectedAnswers] = useState({})
   const [submitted, setSubmitted] = useState(false)
   const [score, setScore] = useState(0)
   const [displayQuestions, setDisplayQuestions] = useState([])
 
+    const fetchQuestions = async () => {
+   const { data, error } = await supabase.from("questions").select("*")
+  console.log('====================================');
+  console.log("from client",data);
+  setDisplayQuestions(data)
+  console.log('===================================='); 
+  }
+    useEffect(() => {
+      fetchQuestions()
+    }, [])
+  const que = 
+  [
+    {
+        "id": "12957",
+        "question": "What does LLM stand for?",
+        "options": [
+            "Large Language Model",
+            "Long Learning Machine",
+            "Limited Linguistic Model",
+            "Layered Logic Module"
+        ],
+        "correctAnswer": "Large Language Model",
+        "explanation": "LLM is a common abbreviation for Large Language Model."
+    },
+    {
+        "id": "83401",
+        "question": "Which of the following is a key characteristic of an LLM?",
+        "options": [
+            "Ability to process images",
+            "Ability to understand and generate human language",
+            "Ability to control robots",
+            "Ability to perform complex calculations"
+        ],
+        "correctAnswer": "Ability to understand and generate human language",
+        "explanation": "LLMs are primarily focused on text-based tasks and understanding/generating human language."
+    },
+    {
+        "id": "27639",
+        "question": "LLMs are typically trained on:",
+        "options": [
+            "Small datasets of structured data",
+            "Large amounts of text data",
+            "Images and videos",
+            "Audio recordings"
+        ],
+        "correctAnswer": "Large amounts of text data",
+        "explanation": "LLMs learn from massive datasets of text and code."
+    },
+    {
+        "id": "51824",
+        "question": "What can LLMs be used for?",
+        "options": [
+            "Building websites",
+            "Creating 3D models",
+            "Generating text, translating languages, and writing different kinds of creative content",
+            "Designing video games"
+        ],
+        "correctAnswer": "Generating text, translating languages, and writing different kinds of creative content",
+        "explanation": "LLMs excel at a variety of language-related tasks, including text generation, translation, and creative writing."
+    },
+    {
+        "id": "95062",
+        "question": "An example of a task an LLM could perform is:",
+        "options": [
+            "Recognizing faces in a photograph",
+            "Playing a game of chess",
+            "Summarizing a news article",
+            "Driving a car"
+        ],
+        "correctAnswer": "Summarizing a news article",
+        "explanation": "Text summarization is a common task for LLMs."
+    }
+]
   // Initialize display questions, applying randomization if needed
+ 
   useEffect(() => {
-    let questionsToDisplay = [...questions]
-    console.log('====================================');
-    console.log(questionsToDisplay);
-    console.log('====================================');
+    let questionsToDisplay = [...displayQuestions]
+
     // Filter out incomplete questions
     questionsToDisplay = questionsToDisplay.filter(
       (q) => q.question && q.options.filter((opt) => opt).length >= 2 && q.correctAnswer,
     )
 
-    // Apply randomization if enabled
-    if (randomizeQuestions) {
-      questionsToDisplay = [...questionsToDisplay].sort(() => Math.random() - 0.5)
-    }
+  
 
     setDisplayQuestions(questionsToDisplay)
-  }, [questions, randomizeQuestions])
+  }, [])
 
   const handleAnswerSelect = (questionIndex, option) => {
     if (submitted) return
@@ -74,9 +141,7 @@ export default function TestPreview({
     <div className="max-w-3xl  mx-auto">
       <div className="mb-6 text-center">
         <h1 className="text-2xl font-bold mb-2">{testTitle}</h1>
-        {subject && <p className="text-gray-600 mb-1">Subject: {subject}</p>}
         {topic && <p className="text-gray-600 mb-1">Topic: {topic}</p>}
-        <p className="text-gray-600">Difficulty: {difficulty}</p>
       </div>
 
       <div className="space-y-6 mb-8">

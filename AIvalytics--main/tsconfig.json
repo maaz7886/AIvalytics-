@@ -22,6 +22,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/api/models/Mcq_tests.js", "src/lib/mongodb.js", "src/app/api/auth/teacherLogin/route.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/api/models/Mcq_tests.js", "src/lib/mongodb.js", "src/app/api/auth/teacherLogin/route.ts", "src/app/api/student/route.ts"],
   "exclude": ["node_modules"]
 }

@@ -20,7 +20,7 @@ export async function POST(request) {
         Provide the response in a clean, minified JSON array format without additional text or comments. and also make  sure the correctAnswer have to be in random order not always.
         Ensure valid JSON format: 
         [
-          {"id": "random 5 digit number id","question": "...", "options": ["...", "...", "...", "..."], "correctAnswer": "...", "explanation": "..."},
+          {"question": "...", "options": ["...", "...", "...", "..."], "correctAnswer": "...", "explanation": "..."},
           ...
         ]`;
 
