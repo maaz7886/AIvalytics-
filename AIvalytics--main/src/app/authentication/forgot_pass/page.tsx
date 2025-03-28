@@ -1,5 +1,5 @@
 "use client"
-
+import { useSearchParams } from "next/navigation"
 import type React from "react"
 
 import { useState } from "react"
@@ -8,11 +8,13 @@ import Link from "next/link"
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("")
   const [submitted, setSubmitted] = useState(false)
+  const searchParams = useSearchParams()
+  const role = searchParams.get("role") || "teacher" // Default to teacher if no role specified
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     // Handle password reset logic here
-    console.log({ email })
+    console.log({ email, role })
     setSubmitted(true)
   }
 
@@ -47,7 +49,11 @@ export default function ForgotPasswordPage() {
               <div>
                 <button
                   type="submit"
-                  className="flex justify-center w-full px-4 py-2 text-sm font-medium text-white bg-emerald-500 border border-transparent rounded-md shadow-sm hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
+                  className={`flex justify-center w-full px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                    role === "teacher"
+                      ? "bg-emerald-500 hover:bg-emerald-600 focus:ring-emerald-500"
+                      : "bg-blue-500 hover:bg-blue-600 focus:ring-blue-500"
+                  }`}
                 >
                   Reset Password
                 </button>
@@ -61,7 +67,9 @@ export default function ForgotPasswordPage() {
             <p className="mt-4 text-sm text-gray-500">Didn't receive the email? Check your spam folder or try again.</p>
             <button
               onClick={() => setSubmitted(false)}
-              className="mt-6 text-sm font-medium text-emerald-500 hover:text-emerald-400"
+              className={`mt-6 text-sm font-medium hover:text-opacity-90 ${
+                role === "teacher" ? "text-emerald-500" : "text-blue-500"
+              }`}
             >
               Try another email
             </button>
@@ -69,7 +77,10 @@ export default function ForgotPasswordPage() {
         )}
 
         <div className="text-center text-sm">
-          <Link href="/login" className="font-medium text-emerald-500 hover:text-emerald-400">
+          <Link
+            href={`/authentication/login?role=${role}`}
+            className={`font-medium hover:text-opacity-90 ${role === "teacher" ? "text-emerald-500" : "text-blue-500"}`}
+          >
             Back to Login
           </Link>
         </div>

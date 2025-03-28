@@ -27,10 +27,10 @@ export default function TopNavBar() {
                 <div className="flex items-center">
                   <img
                     className="h-8 w-8 rounded-full"
-                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                    src="https://media.licdn.com/dms/image/v2/D5603AQEsnkbsu4SOOQ/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1703611781428?e=1746662400&v=beta&t=vRjNdVVL9Wd4w1FBBIdKa2Lg4Y3Occyc_-SF9XhBhlI"
                     alt=""
                   />
-                  <span className="ml-2 text-gray-700">John Smith</span>
+                  <span className="ml-2 text-gray-700">Chetan more</span>
                 </div>
               </div>
             </div>
