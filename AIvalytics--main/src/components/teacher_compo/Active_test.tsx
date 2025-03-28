@@ -18,7 +18,7 @@ export default function Active_test() {
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold text-gray-800">Active Test Sessions</h2>
             <button
-              onClick={() => router.push('/createTest')}
+              onClick={() => router.push('/teacher/createTest')}
               className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-emerald-500 rounded-md hover:bg-emerald-600"
             >
               <Plus className="w-4 h-4" />

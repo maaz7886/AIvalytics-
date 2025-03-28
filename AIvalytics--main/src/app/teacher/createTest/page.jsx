@@ -1,10 +1,15 @@
 "use client"
 
+
+import { useRouter } from 'next/navigation';
 import { useState } from "react"
 import { Trash2, Plus, Wand2, X } from "lucide-react"
 import TestPreview from "./test-preview"
 
 export default function MCQGenerator() {
+
+    const router = useRouter();
+
     const [testTitle, setTestTitle] = useState("")
     const [subject, setSubject] = useState("")
     const [topic, setTopic] = useState("")
@@ -26,16 +31,16 @@ export default function MCQGenerator() {
             const response = await fetch("/api/generate-mcqs", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ topic, difficulty ,noOfQue}),
+                body: JSON.stringify({ topic, difficulty, noOfQue }),
             })
             const data = await response.json()
-            setMcqs((pre) => [ ...data.mcqs,...pre,])
+            setMcqs((pre) => [...data.mcqs, ...pre,])
 
 
         } catch (error) {
             console.error("Error fetching MCQs:", error)
         } finally {
-            setLoading(false)            
+            setLoading(false)
         }
     }
 
@@ -46,7 +51,7 @@ export default function MCQGenerator() {
             options: ["", "", "", ""],
             correctAnswer: "",
         }
-        setMcqs([ newQuestion,...mcqs])
+        setMcqs([newQuestion, ...mcqs])
     }
 
     const removeQuestion = (index) => {
@@ -177,7 +182,7 @@ export default function MCQGenerator() {
                                     <option value="5">5</option>
                                     <option value="10">10</option>
                                     <option value="15">15</option>
-                                    
+
                                 </select>
                             </div>
 
@@ -197,11 +202,11 @@ export default function MCQGenerator() {
                                 <Plus className="w-4 h-4" />
                                 <span>Add Question</span>
                             </button>
-                            <button onClick={togglePreview} className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition">
+                            <button onClick={togglePreview} className="px-6 py-2 border border-gray-300 rounded hover:bg-gray-50 transition">
                                 Preview
                             </button>
                             <button
-                                onClick={saveTest}
+                                onClick={() => router.push('/teacher/publishTest')}
                                 className="px-4 py-2 bg-emerald-500 text-white rounded hover:bg-emerald-600 transition"
                             >
                                 Publish Test
@@ -272,8 +277,8 @@ export default function MCQGenerator() {
 
             {/* Preview Modal */}
             {showPreview && (
-                <div 
-                 className="fixed inset-0 bg-transparent backdrop-blur-md  flex items-center justify-center z-50 p-4">
+                <div
+                    className="fixed inset-0 bg-transparent backdrop-blur-md  flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-l border   shadow-lg w-full max-w-4xl max-h-[90vh] overflow-auto">
                         <div className="flex  justify-between items-center p-4 border-b border-gray-300-b">
                             <h2 className="text-xl font-bold">Test Preview</h2>
