@@ -1,5 +1,5 @@
 "use client"
-
+import { useSearchParams } from "next/navigation"
 import type React from "react"
 
 import { useState } from "react"
@@ -10,38 +10,64 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
+  const [message, setMessage] = useState("")
 
-  const handleSubmit = async(e: React.FormEvent) => {
+  const searchParams = useSearchParams()
+  const role = searchParams.get("role") || "teacher" // Default to teacher if no role specified
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (password!==confirmPassword) {
-      alert("both pass isn't same")
-      return ;
+    setMessage("")
+
+    if (password !== confirmPassword) {
+      setMessage("Passwords don't match")
+      return
     }
+
     try {
-      const response = await fetch("/api/createTeacher", {
+      // Use different endpoints based on role
+      const endpoint = role === "teacher" ? "/api/auth/createTeacher" : "/api/auth/createStudent"
+
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, password, role }),
       })
-      
+
       const data = await response.json()
+
+      if (response.ok) {
+        setMessage(data.message || "Account created successfully!")
+      } else {
+        setMessage(data.error || "Failed to create account")
+      }
     } catch (error) {
       console.error("An unexpected error happened:", error)
+      setMessage("Something went wrong. Please try again.")
     }
-    
-    // Handle registration logic here
-    // console.log({ name, email, password, confirmPassword })
   }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50">
       <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-sm">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900">Create an Account</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Create a {role === "teacher" ? "Teacher" : "Student"} Account
+          </h1>
           <p className="mt-2 text-gray-600">Sign up to get started</p>
         </div>
+
+        {message && (
+          <div
+            className={`p-3 rounded-md ${
+              message.includes("success") ? "bg-green-50 text-green-800" : "bg-red-50 text-red-800"
+            }`}
+          >
+            {message}
+          </div>
+        )}
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-6">
@@ -117,7 +143,11 @@ export default function RegisterPage() {
           <div>
             <button
               type="submit"
-              className="flex justify-center w-full px-4 py-2 text-sm font-medium text-white bg-emerald-500 border border-transparent rounded-md shadow-sm hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
+              className={`flex justify-center w-full px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                role === "teacher"
+                  ? "bg-emerald-500 hover:bg-emerald-600 focus:ring-emerald-500"
+                  : "bg-blue-500 hover:bg-blue-600 focus:ring-blue-500"
+              }`}
             >
               Create Account
             </button>
@@ -126,7 +156,10 @@ export default function RegisterPage() {
 
         <div className="text-center text-sm">
           <span className="text-gray-600">Already have an account? </span>
-          <Link href="/login" className="font-medium text-emerald-500 hover:text-emerald-400">
+          <Link
+            href={`/authentication/login?role=${role}`}
+            className={`font-medium hover:text-opacity-90 ${role === "teacher" ? "text-emerald-500" : "text-blue-500"}`}
+          >
             Login
           </Link>
         </div>
