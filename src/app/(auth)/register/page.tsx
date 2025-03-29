@@ -63,7 +63,7 @@ export default function Register() {
         setServerError(response.message);
       } else {
         router.push("/login");
-        
+
       }
     } catch (error) {
       setServerError("An unexpected error occurred. Please try again.");
