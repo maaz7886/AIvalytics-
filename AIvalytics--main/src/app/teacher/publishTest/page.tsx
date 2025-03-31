@@ -10,15 +10,18 @@ export default function PublishQuizPage() {
   const [selectedClasses, setSelectedClasses] = useState<string[]>(["CS101", "MATH202"])
   const [selectedStudents, setSelectedStudents] = useState<string[]>([])
   const [allStudentsSelected, setAllStudentsSelected] = useState(false)
-// Retrieve MCQs from localStorage
-const [mcqs, setMcqs] = useState(() => {[]});
-useEffect(() => { 
-  const storedMcqs = localStorage.getItem("mcqs");
-  if (storedMcqs) {
-    setMcqs(JSON.parse(storedMcqs));
-  }
- 
-}, []);
+  // Retrieve MCQs from localStorage
+  const [mcqs, setMcqs] = useState(() => { [] });
+  useEffect(() => {
+    const storedMcqs = localStorage.getItem("mcqs");
+    if (storedMcqs) {
+      setMcqs(JSON.parse(storedMcqs));
+    }
+    console.log('====================================');
+    console.log(JSON.parse(storedMcqs!));
+    console.log('====================================');
+   
+  }, []);
 
   // Search state
   const [classSearchTerm, setClassSearchTerm] = useState("")
@@ -138,6 +141,45 @@ useEffect(() => {
     setAllStudentsSelected(allSelected)
   }
 
+  const publishTest = async () => {
+    try {
+      // 1. First insert all questions
+      const { data: questionsData, error: insertError } = await supabase
+        .from('questions')
+        .insert(mcqs)
+        .select('id, created_at');
+  
+      if (insertError) {
+        console.error('Question insertion error details:', insertError);
+        throw new Error(`Failed to insert questions: ${insertError.message}`);
+      }
+  
+      // 2. Check if questions were actually inserted
+      if (!questionsData || questionsData.length === 0) {
+        throw new Error('No questions were inserted - check your data');
+      }
+  
+      // 3. Attempt to create test
+      const { data, error } = await supabase
+      .rpc('create_tests_in_batches');
+    
+    if (error) throw error;
+    
+    if (data) {
+      alert(`Successfully created tests! First test ID: ${data.Title}`);
+    } else {
+      alert('No tests created - need at least 5 unused questions');
+    }
+
+    } catch (err) {
+      // Proper error formatting
+      const errorMessage = err instanceof Error ? err.message : JSON.stringify(err);
+      console.error('Full publish error:', err);
+      alert(`❌ Publish failed: ${errorMessage}`);
+    }
+  };
+  
+
   // Update all students selected state when filtered students change
   useEffect(() => {
     updateAllStudentsSelectedState()
@@ -171,7 +213,7 @@ useEffect(() => {
       {/* Header Section */}
       <header className="border-b bg-white p-4 flex items-center">
         <button className="mr-2"
-        onClick={() => window.history.back()}>
+          onClick={() => window.history.back()}>
           <ArrowLeft className="h-5 w-5 text-gray-600" />
         </button>
         <h1 className="text-lg font-medium">
@@ -246,14 +288,12 @@ useEffect(() => {
                   {/* View Students Button */}
                   <button
                     onClick={() => handleViewStudents(classItem.id)}
-                    className={`flex items-center text-sm font-medium ${
-                      viewingClassId === classItem.id ? "text-blue-500" : "text-emerald-500"
-                    }`}
+                    className={`flex items-center text-sm font-medium ${viewingClassId === classItem.id ? "text-blue-500" : "text-emerald-500"
+                      }`}
                   >
                     <Eye
-                      className={`h-4 w-4 mr-1 ${
-                        viewingClassId === classItem.id ? "text-blue-500" : "text-emerald-500"
-                      }`}
+                      className={`h-4 w-4 mr-1 ${viewingClassId === classItem.id ? "text-blue-500" : "text-emerald-500"
+                        }`}
                     />
                     View Students
                   </button>
@@ -356,18 +396,12 @@ useEffect(() => {
           {selectedClasses.length} classes selected ({totalSelectedStudents} students)
         </div>
         <div className="flex space-x-3">
-          <button className="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50">Cancel</button>
-          <button 
-          onClick={async() => {
-            const { data, error } = await supabase
-  .from('questions')
-  .insert(mcqs)
-  .select() // Returns all inserted records
-            console.log('====================================');
-            console.log(data);
-            console.log('====================================');
-}}
-          className="px-4 py-2 bg-emerald-500 text-white rounded-md hover:bg-emerald-600">Publish Test</button>
+          <button className="px-4 py-2 border border-gray-400 rounded-md text-gray-700 hover:bg-gray-50">Cancel</button>
+          <button
+            onClick={() => publishTest()}
+          >
+            Publish Test
+          </button>
         </div>
       </footer>
     </div>

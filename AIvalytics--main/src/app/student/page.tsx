@@ -6,6 +6,7 @@ import TopNavBar from "@/components/students_compo/TopNavBar"
 import StatsCards from "@/components/students_compo/StatsCards"
 import CompletedTest from "@/components/students_compo/CompletedTest"
 import Test from "@/app/student/test"
+import { supabase } from "@/lib/supabase/client"
 
 // Define types for our data
 type Test = {
@@ -46,8 +47,19 @@ export default function StudentDashboard() {
   const [loading, setLoading] = useState(true)
   const [lastSynced, setLastSynced] = useState<Date>(new Date())
 
+
+  const fetchTests = async () => {
+// Add `.eq()` filter to bypass RLS (temporarily for debugging)
+const { data, count } = await supabase
+  .from('tests')
+  .select('*')
+
+
+console.log('Test data:', data);
+  }
   // Mock data initialization
   useEffect(() => {
+      fetchTests()
     const mockTests: Test[] = [
       { id: "1", name: "Physics Mid-Term", subject: "Physics", dueDate: "Dec 15, 2023", status: "Pending" },
       { id: "2", name: "Chemistry Quiz", subject: "Chemistry", dueDate: "Dec 18, 2023", status: "New" },
@@ -158,13 +170,13 @@ export default function StudentDashboard() {
                 <h3 className="text-lg leading-6 font-medium text-gray-900">Available Tests</h3>
                 <div className="flex mt-2 sm:mt-0 sm:ml-4">
                   {/* Search input */}
-                  <div className="relative rounded-md shadow-sm">
+                  <div className="relative flex justify-center rounded-md shadow-sm">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <Search className="h-5 w-5 text-gray-400" />
                     </div>
                     <input
                       type="text"
-                      className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
+                      className="focus:ring-indigo-500 outline-none focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
                       placeholder="Search tests..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}

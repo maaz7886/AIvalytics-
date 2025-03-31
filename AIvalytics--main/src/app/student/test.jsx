@@ -25,69 +25,7 @@ export default function Test({
     useEffect(() => {
       fetchQuestions()
     }, [])
-  const que = 
-  [
-    {
-        "id": "12957",
-        "question": "What does LLM stand for?",
-        "options": [
-            "Large Language Model",
-            "Long Learning Machine",
-            "Limited Linguistic Model",
-            "Layered Logic Module"
-        ],
-        "correctAnswer": "Large Language Model",
-        "explanation": "LLM is a common abbreviation for Large Language Model."
-    },
-    {
-        "id": "83401",
-        "question": "Which of the following is a key characteristic of an LLM?",
-        "options": [
-            "Ability to process images",
-            "Ability to understand and generate human language",
-            "Ability to control robots",
-            "Ability to perform complex calculations"
-        ],
-        "correctAnswer": "Ability to understand and generate human language",
-        "explanation": "LLMs are primarily focused on text-based tasks and understanding/generating human language."
-    },
-    {
-        "id": "27639",
-        "question": "LLMs are typically trained on:",
-        "options": [
-            "Small datasets of structured data",
-            "Large amounts of text data",
-            "Images and videos",
-            "Audio recordings"
-        ],
-        "correctAnswer": "Large amounts of text data",
-        "explanation": "LLMs learn from massive datasets of text and code."
-    },
-    {
-        "id": "51824",
-        "question": "What can LLMs be used for?",
-        "options": [
-            "Building websites",
-            "Creating 3D models",
-            "Generating text, translating languages, and writing different kinds of creative content",
-            "Designing video games"
-        ],
-        "correctAnswer": "Generating text, translating languages, and writing different kinds of creative content",
-        "explanation": "LLMs excel at a variety of language-related tasks, including text generation, translation, and creative writing."
-    },
-    {
-        "id": "95062",
-        "question": "An example of a task an LLM could perform is:",
-        "options": [
-            "Recognizing faces in a photograph",
-            "Playing a game of chess",
-            "Summarizing a news article",
-            "Driving a car"
-        ],
-        "correctAnswer": "Summarizing a news article",
-        "explanation": "Text summarization is a common task for LLMs."
-    }
-]
+
   // Initialize display questions, applying randomization if needed
  
   useEffect(() => {
@@ -138,56 +76,61 @@ export default function Test({
   }
 
   return (
-    <div className="max-w-3xl  mx-auto">
+    <div className="max-w-3xl mx-auto">
       <div className="mb-6 text-center">
-        <h1 className="text-2xl font-bold mb-2">{testTitle}</h1>
-        {topic && <p className="text-gray-600 mb-1">Topic: {topic}</p>}
+        <h1 className="text-2xl font-bold mb-2">{displayQuestions[0].Title}</h1>
       </div>
 
-      <div className="space-y-6 mb-8">
-        {displayQuestions.map((question, questionIndex) => (
-          <div key={questionIndex} className="p-4 border rounded-lg">
-            <p className="font-medium mb-3">
-              {questionIndex + 1}. {question.question}
-            </p>
-            <div className="space-y-2 ml-4">
-              {question.options
-                .filter((opt) => opt)
-                .map((option, optionIndex) => {
-                  const isCorrect = isAnswerCorrect(questionIndex, option)
-                  return (
-                    <div
-                      key={optionIndex}
-                      className={`flex items-center gap-2 p-2 rounded ${
-                        selectedAnswers[questionIndex] === option ? "bg-blue-50" : ""
-                      } ${isCorrect === true ? "bg-green-50" : isCorrect === false ? "bg-red-50" : ""}`}
-                    >
-                      <input
-                        type="radio"
-                        name={`question-${questionIndex}`}
-                        id={`question-${questionIndex}-option-${optionIndex}`}
-                        checked={selectedAnswers[questionIndex] === option}
-                        onChange={() => handleAnswerSelect(questionIndex, option)}
-                        disabled={submitted}
-                        className="w-4 h-4"
-                      />
-                      <label
-                        htmlFor={`question-${questionIndex}-option-${optionIndex}`}
-                        className="flex-1 cursor-pointer"
+      {displayQuestions.length === 0 ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500 border-solid"></div>
+        </div>
+      ) : (
+        <div className="space-y-6 mb-8">
+          {displayQuestions.map((question, questionIndex) => (
+            <div key={questionIndex} className="p-4 border rounded-lg">
+              <p className="font-medium mb-3">
+                {questionIndex + 1}. {question.question}
+              </p>
+              <div className="space-y-2 ml-4">
+                {question.options
+                  .filter((opt) => opt)
+                  .map((option, optionIndex) => {
+                    const isCorrect = isAnswerCorrect(questionIndex, option)
+                    return (
+                      <div
+                        key={optionIndex}
+                        className={`flex items-center gap-2 p-2 rounded ${
+                          selectedAnswers[questionIndex] === option ? "bg-blue-50" : ""
+                        } ${isCorrect === true ? "bg-green-50" : isCorrect === false ? "bg-red-50" : ""}`}
                       >
-                        {option}
-                      </label>
-                      {isCorrect === true && <CheckCircle className="w-5 h-5 text-green-500" />}
-                      {isCorrect === false && <XCircle className="w-5 h-5 text-red-500" />}
-                    </div>
-                  )
-                })}
+                        <input
+                          type="radio"
+                          name={`question-${questionIndex}`}
+                          id={`question-${questionIndex}-option-${optionIndex}`}
+                          checked={selectedAnswers[questionIndex] === option}
+                          onChange={() => handleAnswerSelect(questionIndex, option)}
+                          disabled={submitted}
+                          className="w-4 h-4"
+                        />
+                        <label
+                          htmlFor={`question-${questionIndex}-option-${optionIndex}`}
+                          className="flex-1 cursor-pointer"
+                        >
+                          {option}
+                        </label>
+                        {isCorrect === true && <CheckCircle className="w-5 h-5 text-green-500" />}
+                        {isCorrect === false && <XCircle className="w-5 h-5 text-red-500" />}
+                      </div>
+                    )
+                  })}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
-      {displayQuestions.length > 0 ? (
+      {displayQuestions.length > 0 && (
         <div className="flex flex-col items-center">
           {!submitted ? (
             <button
@@ -210,13 +153,6 @@ export default function Test({
               </p>
             </div>
           )}
-        </div>
-      ) : (
-        <div className="text-center p-8 border rounded-lg bg-gray-50">
-          <p className="text-gray-500">
-            No valid questions available for preview. Please add complete questions with at least two options and a
-            correct answer.
-          </p>
         </div>
       )}
     </div>

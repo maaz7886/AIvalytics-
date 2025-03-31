@@ -3,7 +3,7 @@ import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 
 export async function POST(request) {
     try {
-        const { topic,difficulty,noOfQue } = await request.json();
+        const { topic,difficulty,noOfQue, testTitle } = await request.json();
 
         if (!topic) {
             return NextResponse.json({ error: "Topic is required" }, { status: 400 });
@@ -16,11 +16,11 @@ export async function POST(request) {
         });
 
         const prompt = `Generate ${noOfQue} multiple-choice questions (MCQs) on the topic "${topic}" & difficulty ${difficulty?difficulty:"easy"}. 
-        Each MCQ should have 4 options, one correct answer, and a brief explanation of the correct answer.
-        Provide the response in a clean, minified JSON array format without additional text or comments. and also make  sure the correctAnswer have to be in random order not always.
+        Each MCQ should have 4 options,and also make  sure the correctAnswer have to be in random order not always, one correct answer, and a brief explanation of the correct answer.
+        Provide the response in a clean, minified JSON array format without additional text or comments. in format dont chage the Title value it will be constant as i provided
         Ensure valid JSON format: 
         [
-          {"question": "...", "options": ["...", "...", "...", "..."], "correctAnswer": "...", "explanation": "..."},
+          {"Title":${testTitle},"question": "...", "options": ["...", "...", "...", "..."], "correctAnswer": "...", "explanation": "..."},
           ...
         ]`;
 
