@@ -112,6 +112,11 @@ The project is organized into the following main directories:
   - **Recent_activity.tsx**: Component for displaying recent user activities.
   - **Sidebar.tsx**: Component for the application's sidebar navigation.
 
+
+  ## Until Next meeting target
+  - **Account Creation**: Student and teacher will able to create their Accounts.
+  - **Test Assign**: Teacher can assign test to students by their classes or individual can select.
+  - **Student respone will be saved in DB**
 ## Getting Started
 
 First, run the development server:
