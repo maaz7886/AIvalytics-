@@ -5,7 +5,6 @@ import Infobar_top from "@/components/teacher_compo/Infobar_top";
 import Sidebar from "@/components/teacher_compo/Sidebar";
 import Active_test from "@/components/teacher_compo/Active_test";
 import Recent_activity from "@/components/teacher_compo/Recent_activity";
-import LogoutButton from "./LogoutButton";
 
 
 export default async function Dashboard() {
@@ -37,7 +36,6 @@ export default async function Dashboard() {
                                     className="object-cover"
                                 />
                             </div>
-                            <LogoutButton />
                         </div>
                     </div>
                 </header>

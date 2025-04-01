@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react"
 import { ArrowLeft, Search, Eye, Image } from "lucide-react"
-import { json } from "stream/consumers"
 import { supabase } from "@/lib/supabase/client"
 
 export default function PublishQuizPage() {
@@ -11,7 +10,7 @@ export default function PublishQuizPage() {
   const [selectedStudents, setSelectedStudents] = useState<string[]>([])
   const [allStudentsSelected, setAllStudentsSelected] = useState(false)
   // Retrieve MCQs from localStorage
-  const [mcqs, setMcqs] = useState(() => { [] });
+  const [mcqs, setMcqs] = useState( []);
   useEffect(() => {
     const storedMcqs = localStorage.getItem("mcqs");
     if (storedMcqs) {

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Search, RefreshCw, Trophy, BookOpen, Clock, CheckCircle, TrendingUp, X } from "lucide-react"
+import { Search, RefreshCw, Trophy, X } from "lucide-react"
 import TopNavBar from "@/components/students_compo/TopNavBar"
 import StatsCards from "@/components/students_compo/StatsCards"
 import CompletedTest from "@/components/students_compo/CompletedTest"

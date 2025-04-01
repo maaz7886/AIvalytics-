@@ -61,7 +61,7 @@ export default function CompletedTest({ completedTests, loading }: CompletedTest
                 ))
               ) : (
                 <div className="px-4 py-5 sm:px-6 text-center text-sm text-gray-500">
-                  You haven't completed any tests yet.
+                  You have not completed any tests yet.
                 </div>
               )}
             </div>
