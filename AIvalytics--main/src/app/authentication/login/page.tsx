@@ -1,7 +1,7 @@
 "use client"
 import { useRouter, useSearchParams } from "next/navigation"
 import type React from "react"
-
+import { supabase } from "@/lib/supabase/client"
 import { useState } from "react"
 import Link from "next/link"
 import { Check } from "lucide-react"
@@ -9,41 +9,43 @@ import { Check } from "lucide-react"
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [message, setMessage] = useState("")
   const [rememberMe, setRememberMe] = useState(false)
+  const [loading, setLoading] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
-  const role = searchParams.get("role") || "teacher" // Default to teacher if no role specified
+  const role = searchParams.get("role") || "students" // Default to student if no role specified
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    setMessage("")
+    setLoading(true)
 
     try {
-      // Use different endpoints based on role
-      const endpoint = role === "teacher" ? "/api/auth/teacherLogin" : "/api/auth/studentLogin"
+      // Fetch user data from Supabase
+      const { data: user, error } = await supabase
+        .from(role) // Assuming your table is named based on the role
+        .select('*')
+        .eq('email', email)
+        .single();
 
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      })
-
-      const data = await res.json()
-      console.log("Full response:", data)
-
-      setMessage(data.message || data.error)
-
-      if (res.ok) {
-        console.log("Redirecting...")
-        // Redirect to appropriate dashboard based on role
-        router.push(role === "teacher" ? "/dashboard/teacher" : "/dashboard/student")
+      if (error || !user) {
+        console.error("User not found:", error);
+        return; // Handle user not found
       }
+
+      // Compare the password (make sure to hash the password when storing it)
+      if (user.password !== password) {
+        console.error("Invalid password");
+        return; // Handle invalid password
+      }
+
+      // If login is successful
+      console.log("Redirecting...", user);
+      localStorage.setItem(`Auth${role}`, JSON.stringify(user));
+      router.push(role === "teachers" ? "/teacher/dashboard" : "/student");
     } catch (error) {
-      console.error("Login error:", error)
-      setMessage("Something went wrong.")
+      console.error("Login error:", error);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -52,7 +54,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-sm">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900">
-            Welcome Back {role === "teacher" ? "Teacher" : "Student"}
+            Welcome Back {role === "teachers" ? "Teacher" : "Student"}
           </h1>
           <p className="mt-2 text-gray-600">Please login to your account</p>
         </div>
@@ -98,9 +100,8 @@ export default function LoginPage() {
             <div className="flex items-center">
               <button
                 type="button"
-                className={`flex items-center justify-center w-5 h-5 border rounded ${
-                  rememberMe ? "bg-emerald-500 border-emerald-500" : "border-gray-300"
-                }`}
+                className={`flex items-center justify-center w-5 h-5 border rounded ${rememberMe ? "bg-emerald-500 border-emerald-500" : "border-gray-300"
+                  }`}
                 onClick={() => setRememberMe(!rememberMe)}
               >
                 {rememberMe && <Check className="w-4 h-4 text-white" />}
@@ -120,13 +121,36 @@ export default function LoginPage() {
           <div>
             <button
               type="submit"
-              className={`flex justify-center w-full px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                role === "teacher"
+              disabled={loading}
+              className={`flex justify-center w-full px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 ${role === "teachers"
                   ? "bg-emerald-500 hover:bg-emerald-600 focus:ring-emerald-500"
                   : "bg-blue-500 hover:bg-blue-600 focus:ring-blue-500"
-              }`}
+                } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
             >
-              Login
+              {loading ? (
+                <svg
+                  className="w-5 h-5 mr-3 -ml-1 text-white animate-spin"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v8H4z"
+                  ></path>
+                </svg>
+              ) : (
+                "Login"
+              )}
             </button>
           </div>
         </form>
@@ -135,7 +159,7 @@ export default function LoginPage() {
           <span className="text-gray-600">Don&apos;t have an account? </span>
           <Link
             href={`/authentication/register?role=${role}`}
-            className={`font-medium hover:text-opacity-90 ${role === "teacher" ? "text-emerald-500" : "text-blue-500"}`}
+            className={`font-medium hover:text-opacity-90 ${role === "teachers" ? "text-emerald-500" : "text-blue-500"}`}
           >
             Create Account
           </Link>
@@ -144,4 +168,3 @@ export default function LoginPage() {
     </div>
   )
 }
-

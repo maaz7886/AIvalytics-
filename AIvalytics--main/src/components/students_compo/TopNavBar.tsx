@@ -52,10 +52,10 @@
 
 
 
-import { Bell, Book } from "lucide-react";
+import { Bell, Book, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const TopNavBar = () => {
+const TopNavBar = ({ name }: { name: string }) => {
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -71,13 +71,11 @@ const TopNavBar = () => {
           </Button>
         
           <div className="flex items-center gap-2">
-            <img
-              className="h-8 w-8 rounded-full"
-              src="https://media.licdn.com/dms/image/v2/D5603AQEsnkbsu4SOOQ/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1703611781428?e=1746662400&v=beta&t=vRjNdVVL9Wd4w1FBBIdKa2Lg4Y3Occyc_-SF9XhBhlI"
-              alt=""
-            />
+            <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+              <User className="h-5 w-5 text-gray-500" />
+            </div>
             <div className="hidden md:block">
-              <span className="text-sm font-medium">Chetan More</span>
+              <span className="text-sm font-medium">{name}</span>
             </div>
           </div>
         </div>

@@ -2,34 +2,16 @@
 
 
 import { BookOpen, FileText, LineChart, Users } from "lucide-react"
-import { useEffect, useState } from "react";
+import { JSX } from "react";
 
 
 
 function Infobar_top() {
-    interface Info {
-        activeTestCount: number;
-        count: number;
-    }
+   
 
-    const [info, setInfo] = useState<Info>({ activeTestCount: 0, count: 0 });
+    const info = { activeTestCount: 0, count: 0 }
     const { activeTestCount, count } = info;
-    useEffect(() => {
-      const fetchInfo = async () => {
-        try {
-          const res = await fetch("/api/infobar_top"); // Replace with your actual backend URL
-          if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-  
-          const data = await res.json(); // Convert response to JSON
-          console.log("Fetched Data:", data); // Debugging
-          setInfo(data);
-        } catch (err) {
-          console.error("Error fetching info:", err);
-        }
-      };
-  
-      fetchInfo();
-    }, []);
+ 
 
 
     return (
@@ -85,7 +67,7 @@ function Infobar_top() {
     )
 }
 
-function StatCard({ title, value, change, icon, positive = true }) {
+function StatCard({ title, value, change, icon, positive = true }: { title: string; value: string | number; change: string; icon: JSX.Element; positive?: boolean }) {
     return (
       <div className="p-6 bg-white rounded-lg shadow-sm">
         <div className="flex justify-between">

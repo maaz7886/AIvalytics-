@@ -186,7 +186,7 @@ export default function MCQGenerator() {
 
                             <button
                                 onClick={fetchMCQs}
-                                disabled={!loading||!topic || !testTitle}
+                                disabled={!topic || !testTitle}
                                 className="flex items-center gap-1 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded disabled:opacity-50 transition"
                             >
                                 <Wand2 className="w-4 h-4" />

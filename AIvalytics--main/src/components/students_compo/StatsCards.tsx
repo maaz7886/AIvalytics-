@@ -110,9 +110,19 @@
 import { Card } from "@/components/ui/card";
 import { Book, LineChart, Target, TrendingUp } from "lucide-react";
 
+
+type Test = {
+  id: string
+  name: string
+  subject: string
+  dueDate: string
+  status: "New" | "Pending" | "Completed"
+  score?: number
+  completedOn?: string
+}
 type StatsCardsProps = {
-  tests: any[];
-  completedTests: any[];
+  tests:Test[];
+  completedTests:Test[]
 };
 
 const StatsCards = ({ tests, completedTests }: StatsCardsProps) => {
