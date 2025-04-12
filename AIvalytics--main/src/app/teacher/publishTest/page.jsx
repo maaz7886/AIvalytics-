@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ArrowLeft, Search, Eye } from "lucide-react"
+import { ArrowLeft, Search, Eye, User } from "lucide-react"
 import { supabase } from "@/lib/supabase/client"
 import Image from "next/image"
 
@@ -28,7 +28,7 @@ export default function PublishQuizPage() {
   const [studentSearchTerm, setStudentSearchTerm] = useState("")
 
   // State for tracking which class's students are being viewed
-  const [viewingClassId, setViewingClassId] = useState<string | null>(null)
+  const [viewingClassId, setViewingClassId] = useState(null)
 
   // Mock data for university classes
   const classes = [
@@ -362,13 +362,7 @@ export default function PublishQuizPage() {
                     />
                     <div className="ml-2 flex items-center">
                       {/* Student Avatar - Using Unsplash for random student images */}
-                      <Image
-                        src={`https://source.unsplash.com/random/40x40/?portrait&sig=${student.id}`}
-                        alt={student.name}
-                        width={40}
-                        height={40}
-                        className="rounded-full object-cover"
-                      />
+                      <User className=" w-8 h-8 p-1 rounded-full border border-gray-400 "/>
                       <div className="ml-3">
                         <label htmlFor={`student-${student.id}`} className="block font-medium">
                           {student.name}
@@ -396,8 +390,9 @@ export default function PublishQuizPage() {
           {selectedClasses.length} classes selected ({totalSelectedStudents} students)
         </div>
         <div className="flex space-x-3">
-          <button className="px-4 py-2 border border-gray-400 rounded-md text-gray-700 hover:bg-gray-50">Cancel</button>
-          <button
+          <button className="px-4 py-2 border border-gray-500 rounded-md text-gray-700 hover:bg-gray-50">
+            Cancel</button>
+          <button  className=" border border-gray-500 px-2 rounded-md"
             onClick={() => publishTest()}
           >
             Publish Test

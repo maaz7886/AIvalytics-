@@ -31,13 +31,16 @@ export default function RegisterPage() {
 
     try {
       // Attempt to insert the new user into the respective table
-      const { error } = await supabase
+      const { data:user,error } = await supabase
         .from(role)
-        .insert([{ full_name: name, email, password }]);
+        .insert([{ full_name: name, email, password }])
+        .select('*').single();
 
       if (error) {
         setMessage("Something went wrong.");
       } else {
+        localStorage.removeItem(`Auth${role}`)
+        localStorage.setItem(`Auth${role}`, JSON.stringify(user));
         setMessage("Account created successfully!");
         router.push(role === "teachers" ? "/teacher/dashboard" : "/student");
       }
