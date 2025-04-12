@@ -1,12 +1,12 @@
 "use client"
 import { useRouter, useSearchParams } from "next/navigation"
-import type React from "react"
+import React from "react"
 import { supabase } from "@/lib/supabase/client"
 import { useState } from "react"
 import Link from "next/link"
 import { Check } from "lucide-react"
 
-export default function LoginPage() {
+export default function LoginFormPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [rememberMe, setRememberMe] = useState(false)
@@ -15,7 +15,7 @@ export default function LoginPage() {
   const searchParams = useSearchParams()
   const role = searchParams.get("role") || "students" // Default to student if no role specified
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e) => {
     e.preventDefault()
     setLoading(true)
 

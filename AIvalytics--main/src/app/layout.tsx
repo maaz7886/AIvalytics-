@@ -5,6 +5,8 @@ import { Inter } from "next/font/google"
 
 const inter = Inter({ subsets: ["latin"] })
 
+// it's important please don't remove this it make all pages dynamic 
+export const dynamic = 'force-dynamic'
 
 
 export default function RootLayout({

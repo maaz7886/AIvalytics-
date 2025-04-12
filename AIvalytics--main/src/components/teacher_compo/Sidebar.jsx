@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { BarChart3, BookOpen, FileText, Home, Users } from "lucide-react"
+import {  BookOpen, FileText, Home } from "lucide-react"
 import Link from "next/link"
 
 export default function Sidebar() {

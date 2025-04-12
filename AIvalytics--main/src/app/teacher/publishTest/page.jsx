@@ -1,13 +1,14 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ArrowLeft, Search, Eye, Image } from "lucide-react"
+import { ArrowLeft, Search, Eye } from "lucide-react"
 import { supabase } from "@/lib/supabase/client"
+import Image from "next/image"
 
 export default function PublishQuizPage() {
   // State for tracking selected classes and students
-  const [selectedClasses, setSelectedClasses] = useState<string[]>(["CS101", "MATH202"])
-  const [selectedStudents, setSelectedStudents] = useState<string[]>([])
+  const [selectedClasses, setSelectedClasses] = useState(["CS101", "MATH202"])
+  const [selectedStudents, setSelectedStudents] = useState([])
   const [allStudentsSelected, setAllStudentsSelected] = useState(false)
   // Retrieve MCQs from localStorage
   const [mcqs, setMcqs] = useState( []);
@@ -17,7 +18,7 @@ export default function PublishQuizPage() {
       setMcqs(JSON.parse(storedMcqs));
     }
     console.log('====================================');
-    console.log(JSON.parse(storedMcqs!));
+    console.log(JSON.parse(storedMcqs));
     console.log('====================================');
    
   }, []);
@@ -84,7 +85,7 @@ export default function PublishQuizPage() {
   })
 
   // Toggle class selection
-  const toggleClass = (classId: string) => {
+  const toggleClass = (classId) => {
     if (selectedClasses.includes(classId)) {
       setSelectedClasses(selectedClasses.filter((id) => id !== classId))
 
@@ -104,7 +105,7 @@ export default function PublishQuizPage() {
   }
 
   // Toggle student selection
-  const toggleStudent = (studentId: string) => {
+  const toggleStudent = (studentId) => {
     if (selectedStudents.includes(studentId)) {
       setSelectedStudents(selectedStudents.filter((id) => id !== studentId))
       setAllStudentsSelected(false)
@@ -181,8 +182,8 @@ export default function PublishQuizPage() {
 
   // Update all students selected state when filtered students change
   useEffect(() => {
-    updateAllStudentsSelectedState()
-  }, [filteredStudents, selectedStudents])
+    updateAllStudentsSelectedState();
+  }, [filteredStudents, selectedStudents, updateAllStudentsSelectedState]);
 
   // Calculate total selected students
   const totalSelectedStudents = selectedClasses.reduce((total, classId) => {
@@ -191,7 +192,7 @@ export default function PublishQuizPage() {
   }, 0)
 
   // Handle view students click
-  const handleViewStudents = (classId: string) => {
+  const handleViewStudents = (classId) => {
     if (viewingClassId === classId) {
       // If already viewing this class, clear the filter
       setViewingClassId(null)

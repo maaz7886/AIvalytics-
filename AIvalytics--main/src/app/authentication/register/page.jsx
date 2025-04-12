@@ -10,6 +10,9 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [message, setMessage] = useState("")
+  
+  const [loading, setLoading] = useState(false)
+
   const router = useRouter()
 
   const searchParams = useSearchParams()
@@ -17,6 +20,8 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setLoading(true)
+
     setMessage("")
 
     if (password !== confirmPassword) {
@@ -24,16 +29,25 @@ export default function RegisterPage() {
       return
     }
 
-    // simple insert to the respective table
-    const { error } = await supabase
-      .from(role)
-      .insert([{ full_name:name, email, password }])
+    try {
+      // Attempt to insert the new user into the respective table
+      const { error } = await supabase
+        .from(role)
+        .insert([{ full_name: name, email, password }]);
 
-    if (error) {
-      setMessage("Something went wrong.")
-    } else {
-      setMessage("Account created successfully!")
-      router.push(role === "teacher" ? "/teacher/dashboard" : "/student")
+      if (error) {
+        setMessage("Something went wrong.");
+      } else {
+        setMessage("Account created successfully!");
+        router.push(role === "teachers" ? "/teacher/dashboard" : "/student");
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      setMessage("An unexpected error occurred. Please try again.");
+    } finally {
+      // Optional: Any cleanup or final actions can be performed here
+      console.log("Registration attempt finished.");
+      setLoading(false)
     }
   }
 
@@ -42,7 +56,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-sm">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900">
-            Create a {role === "teacher" ? "Teacher" : "Student"} Account
+            Create a {role === "teachers" ? "Teacher" : "Student"} Account
           </h1>
           <p className="mt-2 text-gray-600">Sign up to get started</p>
         </div>
@@ -107,9 +121,36 @@ export default function RegisterPage() {
           <div>
             <button
               type="submit"
-              className="w-full px-4 py-2 font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none"
+              disabled={loading}
+              className={`flex justify-center w-full px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 ${role === "teachers"
+                  ? "bg-emerald-500 hover:bg-emerald-600 focus:ring-emerald-500"
+                  : "bg-blue-500 hover:bg-blue-600 focus:ring-blue-500"
+                } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
             >
-              Create Account
+              {loading ? (
+                <svg
+                  className="w-5 h-5 mr-3 -ml-1 text-white animate-spin"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v8H4z"
+                  ></path>
+                </svg>
+              ) : (
+                "Create Account"
+              )}
             </button>
           </div>
         </form>
