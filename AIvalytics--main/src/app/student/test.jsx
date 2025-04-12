@@ -7,7 +7,7 @@ import { CheckCircle, XCircle } from "lucide-react"
 export default function Test({ test_id,student_id }) {
   const [selectedAnswers, setSelectedAnswers] = useState({})
   const [submitted, setSubmitted] = useState(false)
-  const [score, setScore] = useState(0)
+  const [score, setScore] = useState()
   const [displayQuestions, setDisplayQuestions] = useState([]) // Initialize as empty array
 
   const fetchQuestions = async () => {
@@ -50,19 +50,6 @@ export default function Test({ test_id,student_id }) {
       };
     });
 
-   
-    try {
-      const { data, error } = await supabase
-        .from("test_attempts")
-        .insert([{ test_id, student_id, submited_test: submittedTestArray, score }]);
-
-      if (error) {
-        throw new Error(error.message);
-      }
-    } catch (error) {
-      console.error("Error submitting test attempt:", error);
-    }
-
     let correctCount = 0;
 
     displayQuestions.forEach((question, index) => {
@@ -72,6 +59,19 @@ export default function Test({ test_id,student_id }) {
     });
 
     setScore(correctCount);
+    try {
+      const { data, error } = await supabase
+        .from("test_attempts")
+        .insert([{ test_id, student_id, submitted_test: submittedTestArray, score:correctCount }]);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+    } catch (error) {
+      console.error("Error submitting test attempt:", error);
+    }
+
+    
     setSubmitted(true);
   }
 

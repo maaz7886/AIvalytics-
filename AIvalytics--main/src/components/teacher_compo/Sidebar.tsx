@@ -1,13 +1,14 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { BarChart3, BookOpen, FileText, Home, Users } from "lucide-react"
 import Link from "next/link"
 
-
 export default function Sidebar() {
+  const [activeTab, setActiveTab] = useState("/"); // Default active tab
+
   return (
     <div>
         {/* Sidebar */}
-        <div className="w-64 bg-white ">
+        <div className="w-64 bg-white border-gray-300 border h-screen ">
                 <div className="p-4">
                     <Link href="/" className="flex items-center gap-2">
                         <div className=" h-8 bg-indigo-500 rounded-md px-2 flex items-center justify-center">
@@ -18,40 +19,38 @@ export default function Sidebar() {
                 <nav className="mt-6">
                     <div className="px-3">
                         <Link
-                            href="/"
-                            className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md bg-emerald-50 text-emerald-500"
+                            href="/teacher/dashboard"
+                            className={`flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md ${activeTab === "/" ? "bg-emerald-50 text-emerald-500" : "text-gray-600 hover:bg-gray-50"}`}
+                            onClick={() => setActiveTab("/")}
                         >
                             <Home className="w-5 h-5" />
                             Dashboard
                         </Link>
                         <Link
-                            href="/mcqs"
-                            className="flex items-center gap-3 px-3 py-2 mt-1 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50"
+                            href="/teacher/createTest"
+                            className={`flex items-center gap-3 px-3 py-2 mt-1 text-sm font-medium rounded-md ${activeTab === "/teacher/createTest" ? "bg-emerald-50 text-emerald-500" : "text-gray-600 hover:bg-gray-50"}`}
+                            onClick={() => setActiveTab("/teacher/createTest")}
                         >
                             <BookOpen className="w-5 h-5" />
-                            MCQs
+                            createTest
                         </Link>
                         <Link
-                            href="/quiz-sessions"
-                            className="flex items-center gap-3 px-3 py-2 mt-1 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50"
+                            href="/teacher/submittedTests"
+                            className={`flex items-center gap-3 px-3 py-2 mt-1 text-sm font-medium rounded-md ${activeTab === "/teacher/submittedTests" ? "bg-emerald-50 text-emerald-500" : "text-gray-600 hover:bg-gray-50"}`}
+                            onClick={() => setActiveTab("/teacher/submittedTests")}
                         >
                             <FileText className="w-5 h-5" />
-                            Quiz Sessions
+                            Submitted Tests
                         </Link>
-                        <Link
+                        {/* <Link
                             href="/students"
-                            className="flex items-center gap-3 px-3 py-2 mt-1 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50"
+                            className={`flex items-center gap-3 px-3 py-2 mt-1 text-sm font-medium rounded-md ${activeTab === "/students" ? "bg-emerald-50 text-emerald-500" : "text-gray-600 hover:bg-gray-50"}`}
+                            onClick={() => setActiveTab("/students")}
                         >
                             <Users className="w-5 h-5" />
                             Students
-                        </Link>
-                        <Link
-                            href="/reports"
-                            className="flex items-center gap-3 px-3 py-2 mt-1 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50"
-                        >
-                            <BarChart3 className="w-5 h-5" />
-                            Reports
-                        </Link>
+                        </Link> */}
+                        
                     </div>
                 </nav>
             </div>

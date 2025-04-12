@@ -1,7 +1,6 @@
 "use client"
 import Image from "next/image";
 import Infobar_top from "@/components/teacher_compo/Infobar_top";
-import Sidebar from "@/components/teacher_compo/Sidebar";
 import Active_test from "@/components/teacher_compo/Active_test";
 import Recent_activity from "@/components/teacher_compo/Recent_activity";
 import { useEffect, useState } from "react";
@@ -21,7 +20,6 @@ export default function Dashboard() {
     return (
         <div className="flex min-h-screen bg-gray-50">
             {/* Sidebar */}
-            <Sidebar />
 
             {/* Main Content */}
             <div className="flex-1 border-2 border-t-0 border-gray-400">
