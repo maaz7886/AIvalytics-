@@ -120,11 +120,7 @@ console.log('Test data:', data);
     setShowPreview(!showPreview)
 }
 
-  // Function to get unique subjects for filter dropdown
-  const getUniqueSubjects = () => {
-    const subjects = tests.map((test) => test.subject)
-    return ["All Subjects", ...Array.from(new Set(subjects))]
-  }
+
 
   useEffect(() => {
     const studentData = localStorage.getItem('Authstudents')
