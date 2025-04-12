@@ -37,7 +37,24 @@ export async function POST(request) {
 
         return NextResponse.json({ mcqs });
     } catch (error) {
-        console.error("MCQ generation error:", error);
-        return NextResponse.json({ error: "Failed to generate MCQs" }, { status: 500 });
+        // In your API route
+console.log('Request received:', {
+    topic,
+    difficulty,
+    noOfQue,
+    testTitle,
+    env: process.env.NODE_ENV,
+    vercelRegion: process.env.VERCEL_REGION
+  })
+  
+  // In your browser console
+  if (process.env.NODE_ENV === 'production') {
+    console.log('Vercel Deployment Details:', {
+      url: window.location.origin,
+      env: process.env
+    })
+  }
+        // console.error("MCQ generation error:", error);
+        return NextResponse.json({ error: "Failed to generate MCQs",error:error }, { status: 500 });
     }
 }
