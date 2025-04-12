@@ -59,10 +59,10 @@
 
 | Feature Category                      | Feature Description                                                                 | Status                |
 | ------------------------------------- | ----------------------------------------------------------------------------------- | --------------------- |
-| **Content Creation & MCQ Generation** | Teachers submit educational content via WhatsApp.                                   | Not Implemented       |
-|                                       | Backend Server routes content to the AI/ML Engine.                                  | Partially Implemented |
+| **Content Creation & MCQ Generation** | Teachers submit educational content via WhatsApp.                                   |  Implemented       |
+|                                       | Backend Server routes content to the AI/ML Engine.                                  | Implemented |
 |                                       | AI/ML Engine generates unique MCQs.                                                 | Implemented           |
-|                                       | Generated MCQs are stored in the Unique MCQ Database.                               | Not Implemented       |
+|                                       | Generated MCQs are stored in the Unique MCQ Database.                               | Implemented       |
 | **Student Assessment Process**        | Unique MCQ sets are distributed to students via WhatsApp.                           | Not Implemented       |
 |                                       | Students complete MCQ tests in WhatsApp.                                            | Not Implemented       |
 |                                       | Completed tests are submitted back through WhatsApp.                                | Not Implemented       |
@@ -112,6 +112,11 @@ The project is organized into the following main directories:
   - **Recent_activity.tsx**: Component for displaying recent user activities.
   - **Sidebar.tsx**: Component for the application's sidebar navigation.
 
+
+  ## Until Next meeting target
+  - **Account Creation**: Student and teacher will able to create their Accounts.
+  - **Test Assign**: Teacher can assign test to students by their classes or individual can select.
+  - **Student respone will be saved in DB**
 ## Getting Started
 
 First, run the development server:
