@@ -1,193 +1,144 @@
 "use client"
 
+import { supabase } from "@/lib/supabase/client"
 import { useState, useEffect } from "react"
 import { CheckCircle, XCircle } from "lucide-react"
-import { supabase } from "@/lib/supabase/client"
 
-export default function Test({
-  testTitle,
-  topic
-}) {
-
-  
+export default function Test({ test_id,student_id }) {
   const [selectedAnswers, setSelectedAnswers] = useState({})
   const [submitted, setSubmitted] = useState(false)
   const [score, setScore] = useState(0)
-  const [displayQuestions, setDisplayQuestions] = useState([])
+  const [displayQuestions, setDisplayQuestions] = useState([]) // Initialize as empty array
 
-    const fetchQuestions = async () => {
-   const { data, error } = await supabase.from("questions").select("*")
-  console.log('====================================');
-  console.log("from client",data);
-  setDisplayQuestions(data)
-  console.log('===================================='); 
-  }
-    useEffect(() => {
-      fetchQuestions()
-    }, [])
-  const que = 
-  [
-    {
-        "id": "12957",
-        "question": "What does LLM stand for?",
-        "options": [
-            "Large Language Model",
-            "Long Learning Machine",
-            "Limited Linguistic Model",
-            "Layered Logic Module"
-        ],
-        "correctAnswer": "Large Language Model",
-        "explanation": "LLM is a common abbreviation for Large Language Model."
-    },
-    {
-        "id": "83401",
-        "question": "Which of the following is a key characteristic of an LLM?",
-        "options": [
-            "Ability to process images",
-            "Ability to understand and generate human language",
-            "Ability to control robots",
-            "Ability to perform complex calculations"
-        ],
-        "correctAnswer": "Ability to understand and generate human language",
-        "explanation": "LLMs are primarily focused on text-based tasks and understanding/generating human language."
-    },
-    {
-        "id": "27639",
-        "question": "LLMs are typically trained on:",
-        "options": [
-            "Small datasets of structured data",
-            "Large amounts of text data",
-            "Images and videos",
-            "Audio recordings"
-        ],
-        "correctAnswer": "Large amounts of text data",
-        "explanation": "LLMs learn from massive datasets of text and code."
-    },
-    {
-        "id": "51824",
-        "question": "What can LLMs be used for?",
-        "options": [
-            "Building websites",
-            "Creating 3D models",
-            "Generating text, translating languages, and writing different kinds of creative content",
-            "Designing video games"
-        ],
-        "correctAnswer": "Generating text, translating languages, and writing different kinds of creative content",
-        "explanation": "LLMs excel at a variety of language-related tasks, including text generation, translation, and creative writing."
-    },
-    {
-        "id": "95062",
-        "question": "An example of a task an LLM could perform is:",
-        "options": [
-            "Recognizing faces in a photograph",
-            "Playing a game of chess",
-            "Summarizing a news article",
-            "Driving a car"
-        ],
-        "correctAnswer": "Summarizing a news article",
-        "explanation": "Text summarization is a common task for LLMs."
+  const fetchQuestions = async () => {
+    try {
+      const { data, error } = await supabase
+        .rpc('get_questions_by_test_id', { test_id });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      setDisplayQuestions(data);
+    } catch (error) {
+      console.error("Error fetching questions:", error);
     }
-]
-  // Initialize display questions, applying randomization if needed
- 
+  }
+
   useEffect(() => {
-    let questionsToDisplay = [...displayQuestions]
-
-    // Filter out incomplete questions
-    questionsToDisplay = questionsToDisplay.filter(
-      (q) => q.question && q.options.filter((opt) => opt).length >= 2 && q.correctAnswer,
-    )
-
-  
-
-    setDisplayQuestions(questionsToDisplay)
-  }, [])
+    fetchQuestions(); // Call the fetch function on component mount
+  }, [test_id]); // Dependency on test_id to refetch if it changes
 
   const handleAnswerSelect = (questionIndex, option) => {
-    if (submitted) return
+    if (submitted) return;
 
     setSelectedAnswers({
       ...selectedAnswers,
       [questionIndex]: option,
-    })
+    });
   }
 
-  const handleSubmit = () => {
-    if (submitted) return
+  const handleSubmit = async () => {
+    if (submitted) return;
 
-    let correctCount = 0
+    // Convert selectedAnswers to an array of objects including question ID
+    const submittedTestArray = Object.entries(selectedAnswers).map(([questionIndex, answer]) => {
+      const question = displayQuestions[questionIndex]; // Get the question object
+      return {
+        question_id: question.id, // Assuming each question has a unique 'id'
+        answer: answer,
+      };
+    });
+
+   
+    try {
+      const { data, error } = await supabase
+        .from("test_attempts")
+        .insert([{ test_id, student_id, submited_test: submittedTestArray, score }]);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+    } catch (error) {
+      console.error("Error submitting test attempt:", error);
+    }
+
+    let correctCount = 0;
 
     displayQuestions.forEach((question, index) => {
       if (selectedAnswers[index] === question.correctAnswer) {
-        correctCount++
+        correctCount++;
       }
-    })
+    });
 
-    setScore(correctCount)
-    setSubmitted(true)
+    setScore(correctCount);
+    setSubmitted(true);
   }
 
   const isAnswerCorrect = (questionIndex, option) => {
-    if (!submitted ) return null
+    if (!submitted) return null;
 
-    const question = displayQuestions[questionIndex]
+    const question = displayQuestions[questionIndex];
     if (option === question.correctAnswer) {
-      return true
+      return true;
     }
-    return selectedAnswers[questionIndex] === option ? false : null
+    return selectedAnswers[questionIndex] === option ? false : null;
   }
 
   return (
-    <div className="max-w-3xl  mx-auto">
+    <div className="max-w-3xl mx-auto">
       <div className="mb-6 text-center">
-        <h1 className="text-2xl font-bold mb-2">{testTitle}</h1>
-        {topic && <p className="text-gray-600 mb-1">Topic: {topic}</p>}
+        <h1 className="text-2xl font-bold mb-2">{displayQuestions.length > 0 ? displayQuestions[0].Title : "Loading..."}</h1>
       </div>
 
-      <div className="space-y-6 mb-8">
-        {displayQuestions.map((question, questionIndex) => (
-          <div key={questionIndex} className="p-4 border rounded-lg">
-            <p className="font-medium mb-3">
-              {questionIndex + 1}. {question.question}
-            </p>
-            <div className="space-y-2 ml-4">
-              {question.options
-                .filter((opt) => opt)
-                .map((option, optionIndex) => {
-                  const isCorrect = isAnswerCorrect(questionIndex, option)
-                  return (
-                    <div
-                      key={optionIndex}
-                      className={`flex items-center gap-2 p-2 rounded ${
-                        selectedAnswers[questionIndex] === option ? "bg-blue-50" : ""
-                      } ${isCorrect === true ? "bg-green-50" : isCorrect === false ? "bg-red-50" : ""}`}
-                    >
-                      <input
-                        type="radio"
-                        name={`question-${questionIndex}`}
-                        id={`question-${questionIndex}-option-${optionIndex}`}
-                        checked={selectedAnswers[questionIndex] === option}
-                        onChange={() => handleAnswerSelect(questionIndex, option)}
-                        disabled={submitted}
-                        className="w-4 h-4"
-                      />
-                      <label
-                        htmlFor={`question-${questionIndex}-option-${optionIndex}`}
-                        className="flex-1 cursor-pointer"
+      {displayQuestions.length === 0 ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500 border-solid"></div>
+        </div>
+      ) : (
+        <div className="space-y-6 mb-8">
+          {displayQuestions.map((question, questionIndex) => (
+            <div key={questionIndex} className="p-4 border rounded-lg">
+              <p className="font-medium mb-3">
+                {questionIndex + 1}. {question.question}
+              </p>
+              <div className="space-y-2 ml-4">
+                {question.options
+                  .filter((opt) => opt)
+                  .map((option, optionIndex) => {
+                    const isCorrect = isAnswerCorrect(questionIndex, option);
+                    return (
+                      <div
+                        key={optionIndex}
+                        className={`flex items-center gap-2 p-2 rounded ${selectedAnswers[questionIndex] === option ? "bg-blue-50" : ""} ${isCorrect === true ? "bg-green-50" : isCorrect === false ? "bg-red-50" : ""}`}
                       >
-                        {option}
-                      </label>
-                      {isCorrect === true && <CheckCircle className="w-5 h-5 text-green-500" />}
-                      {isCorrect === false && <XCircle className="w-5 h-5 text-red-500" />}
-                    </div>
-                  )
-                })}
+                        <input
+                          type="radio"
+                          name={`question-${questionIndex}`}
+                          id={`question-${questionIndex}-option-${optionIndex}`}
+                          checked={selectedAnswers[questionIndex] === option}
+                          onChange={() => handleAnswerSelect(questionIndex, option)}
+                          disabled={submitted}
+                          className="w-4 h-4"
+                        />
+                        <label
+                          htmlFor={`question-${questionIndex}-option-${optionIndex}`}
+                          className="flex-1 cursor-pointer"
+                        >
+                          {option}
+                        </label>
+                        {isCorrect === true && <CheckCircle className="w-5 h-5 text-green-500" />}
+                        {isCorrect === false && <XCircle className="w-5 h-5 text-red-500" />}
+                      </div>
+                    )
+                  })}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
-      {displayQuestions.length > 0 ? (
+      {displayQuestions.length > 0 && (
         <div className="flex flex-col items-center">
           {!submitted ? (
             <button
@@ -211,15 +162,7 @@ export default function Test({
             </div>
           )}
         </div>
-      ) : (
-        <div className="text-center p-8 border rounded-lg bg-gray-50">
-          <p className="text-gray-500">
-            No valid questions available for preview. Please add complete questions with at least two options and a
-            correct answer.
-          </p>
-        </div>
       )}
     </div>
   )
 }
-

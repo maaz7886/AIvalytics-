@@ -19,49 +19,26 @@ export default function MCQGenerator() {
     const [randomizeQuestions, setRandomizeQuestions] = useState(false)
 
 
-    const [mcqs, setMcqs] = useState([ 
-        {
-        "id": "95062",
-        "question": "An example of a task an LLM could perform is:",
-        "options": [
-            "Recognizing faces in a photograph",
-            "Playing a game of chess",
-            "Summarizing a news article",
-            "Driving a car"
-        ],
-        "correctAnswer": "Summarizing a news article",
-        "explanation": "Text summarization is a common task for LLMs."
-    },
-        {
-        "id": "95062",
-        "question": "An example of a task an LLM could perform is:",
-        "options": [
-            "Recognizing faces in a photograph",
-            "Playing a game of chess",
-            "Summarizing a news article",
-            "Driving a car"
-        ],
-        "correctAnswer": "Summarizing a news article",
-        "explanation": "Text summarization is a common task for LLMs."
-    },
-])
+    const [mcqs, setMcqs] = useState([])
     const [loading, setLoading] = useState(false)
     const [showPreview, setShowPreview] = useState(false)
 
     const fetchMCQs = async () => {
-        if (!topic) return
+        if (!testTitle || !topic) return
         setLoading(true)
 
         try {
             const response = await fetch("/api/generate-mcqs", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ topic, difficulty, noOfQue }),
+                body: JSON.stringify({ topic, difficulty, noOfQue,testTitle }),
             })
             const data = await response.json()
-            setMcqs((pre) => [...data.mcqs, ...pre,])
+            setMcqs((pre) => [...data.mcqs, ...pre])
 
-
+            console.log('====================================');
+            console.log(data.mcqs);
+            console.log('====================================');
         } catch (error) {
             console.error("Error fetching MCQs:", error)
         } finally {
@@ -106,9 +83,10 @@ export default function MCQGenerator() {
     const saveTest = () => {
         // Implement save functionality
         router.push('/teacher/publishTest')
-
+        localStorage.removeItem('mcqs')
         // Save MCQs to local storage for now
-        localStorage.setItem('mcqs', JSON.stringify(mcqs));
+      localStorage.setItem('mcqs', JSON.stringify(mcqs));
+
     }
 
     const togglePreview = () => {
@@ -190,7 +168,6 @@ export default function MCQGenerator() {
                                 <label htmlFor="randomize">Randomize questions</label>
                             </div>
 
-                            {/* No of questions */}
 
                             <div className=" ">
                                 <label className="block text-sm font-medium mb-1">no. of Question's</label>
@@ -209,7 +186,7 @@ export default function MCQGenerator() {
 
                             <button
                                 onClick={fetchMCQs}
-                                disabled={loading || !topic}
+                                disabled={!topic || !testTitle}
                                 className="flex items-center gap-1 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded disabled:opacity-50 transition"
                             >
                                 <Wand2 className="w-4 h-4" />

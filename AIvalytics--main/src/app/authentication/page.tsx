@@ -22,13 +22,13 @@ export default function WelcomePage() {
             </p>
             <div className="mt-auto space-y-4 w-full">
               <Link
-                href="/authentication/login?role=teacher"
+                href="/authentication/login?role=teachers"
                 className="flex justify-center w-full px-6 py-3 text-white bg-emerald-500 rounded-md hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
               >
                 Login as Teacher
               </Link>
               <Link
-                href="/authentication/register?role=teacher"
+                href="/authentication/register?role=teachers"
                 className="flex justify-center w-full px-6 py-3 text-emerald-600 bg-white border border-emerald-500 rounded-md hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
               >
                 Register as Teacher
@@ -47,13 +47,14 @@ export default function WelcomePage() {
             </p>
             <div className="mt-auto space-y-4 w-full">
               <Link
-                href="/authentication/login?role=student"
+                href="/authentication/login?role=students"
                 className="flex justify-center w-full px-6 py-3 text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               >
                 Login as Student
               </Link>
+              
               <Link
-                href="/authentication/register?role=student"
+                href="/authentication/register?role=students"
                 className="flex justify-center w-full px-6 py-3 text-blue-600 bg-white border border-blue-500 rounded-md hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               >
                 Register as Student
