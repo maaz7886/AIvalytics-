@@ -94,11 +94,11 @@ export default function SubmittedTestsPage() {
         // Score filter
         let scoreMatch = true
         if (scoreFilter === "high") {
-            scoreMatch = submission.score >= 90
+            scoreMatch = submission.score === 5
         } else if (scoreFilter === "medium") {
-            scoreMatch = submission.score >= 70 && submission.score < 90
+            scoreMatch = submission.score >=  2 && submission.score < 4
         } else if (scoreFilter === "low") {
-            scoreMatch = submission.score !== null && submission.score < 70
+            scoreMatch = submission.score !== null && submission.score < 2
         }
 
         // Status filter
@@ -172,9 +172,9 @@ export default function SubmittedTestsPage() {
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="all">All Scores</SelectItem>
-                                <SelectItem value="high">90% or above</SelectItem>
-                                <SelectItem value="medium">70% - 89%</SelectItem>
-                                <SelectItem value="low">Below 70%</SelectItem>
+                                <SelectItem value="high">5</SelectItem>
+                                <SelectItem value="medium">2-4</SelectItem>
+                                <SelectItem value="low">0-1</SelectItem>
                             </SelectContent>
                         </Select>
 
@@ -205,7 +205,7 @@ export default function SubmittedTestsPage() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {submittedTests.map((submission) => (
+                            {filteredSubmissions.map((submission) => (
                                 <TableRow key={submission.id}>
                                     <TableCell>
                                         <div className="flex items-center gap-3">
