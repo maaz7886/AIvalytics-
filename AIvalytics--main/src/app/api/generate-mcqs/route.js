@@ -5,13 +5,26 @@ export async function POST(request) {
     try {
         const { topic,difficulty,noOfQue, testTitle } = await request.json();
 
-        if (!topic) {
-            return NextResponse.json({ error: "Topic is required" }, { status: 400 });
+        if (!topic || !noOfQue || !testTitle) {
+            return NextResponse.json(
+                { error: "Topic, number of questions and test title are required" }, 
+                { status: 400 }
+            );
+        }
+
+        // Verify Google API key is present
+        if (!process.env.GOOGLE_API_KEY) {
+            console.error("Google API key is missing");
+            return NextResponse.json(
+                { error: "Server configuration error" },
+                { status: 500 }
+            );
         }
 
         const llm = new ChatGoogleGenerativeAI({
             model: "gemini-1.5-pro",
-            temperature: 2,
+            apiKey: process.env.GOOGLE_API_KEY, // Explicitly pass the API key
+            temperature: 0.7, // Reduced from 2 (2 is too high)
             maxRetries: 2,
         });
 
@@ -36,25 +49,26 @@ export async function POST(request) {
         }
 
         return NextResponse.json({ mcqs });
-    } catch (error) {
-        // In your API route
-console.log('Request received:', {
-    topic,
-    difficulty,
-    noOfQue,
-    testTitle,
-    env: process.env.NODE_ENV,
-    vercelRegion: process.env.VERCEL_REGION
-  })
-  
-  // In your browser console
-  if (process.env.NODE_ENV === 'production') {
-    console.log('Vercel Deployment Details:', {
-      url: window.location.origin,
-      env: process.env
-    })
-  }
-        // console.error("MCQ generation error:", error);
-        return NextResponse.json({ error: "Failed to generate MCQs",error:error }, { status: 500 });
+    } catch(error) {
+        console.error("Full error:", {
+            message: error.message,
+            stack: error.stack,
+            environment: process.env.NODE_ENV
+        });
+        
+        return NextResponse.json(
+            { 
+                error: "Failed to generate MCQs",
+                details: error.message 
+            }, 
+            { status: 500 }
+        );
     }
+
+
+
+
+
 }
+
+
