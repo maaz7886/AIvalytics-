@@ -23,7 +23,7 @@ export async function POST(request) {
 
         const llm = new ChatGoogleGenerativeAI({
             model: "gemini-1.5-pro",
-            apiKey: "AIzaSyDt_n7omlBI0D8B8N-U6wm6rSsTwU4UJK8", // Explicitly pass the API key
+            apiKey: process.env.GOOGLE_API_KEY, // Explicitly pass the API key
             temperature: 0.7, // Reduced from 2 (2 is too high)
             maxRetries: 2,
         });
