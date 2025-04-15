@@ -23,6 +23,7 @@ export default function SubmittedTestsPage() {
     const [showTestModal, setShowTestModal] = useState(false)
     const itemsPerPage = 7
     const [viewTest, setViewTest] = useState([])
+    const [loading, setLoading] = useState(true)
 
     const fetchSubmittedTests = async () => {
         try {
@@ -64,6 +65,8 @@ export default function SubmittedTestsPage() {
             console.log('====================================');
         } catch (error) {
             console.error("Error fetching submitted tests:", error);
+        } finally {
+            setLoading(false)
         }
     };
 
@@ -96,7 +99,7 @@ export default function SubmittedTestsPage() {
         if (scoreFilter === "high") {
             scoreMatch = submission.score === 5
         } else if (scoreFilter === "medium") {
-            scoreMatch = submission.score >=  2 && submission.score < 4
+            scoreMatch = submission.score >= 2 && submission.score < 4
         } else if (scoreFilter === "low") {
             scoreMatch = submission.score !== null && submission.score < 2
         }
@@ -201,58 +204,94 @@ export default function SubmittedTestsPage() {
                                 <TableHead>TEST NAME</TableHead>
                                 <TableHead>SUBMISSION DATE</TableHead>
                                 <TableHead className="text-center">SCORE</TableHead>
-                                <TableHead className="text-right relative right-6 ">ACTIONS</TableHead>
+                                <TableHead className="text-center">STATUS</TableHead>
+                                <TableHead className="text-center">ACTIONS</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {filteredSubmissions.map((submission) => (
-                                <TableRow key={submission.id}>
-                                    <TableCell>
-                                        <div className="flex items-center gap-3">
-                                            <User className={`h-8 w-8 bg-gray-300 p-1 rounded-2xl `} />
-                                            <div>
-                                                <div className="font-medium">{submission.student_name}</div>
+                            {loading ? (
+                                // Loading skeleton
+                                Array.from({ length: itemsPerPage }).map((_, index) => (
+                                    <TableRow key={index}>
+                                        <TableCell>
+                                            <div className="flex items-center gap-3">
+                                                <div className="h-8 w-8 bg-gray-300 rounded-full animate-pulse"></div>
+                                                <div className="h-4 bg-gray-300 rounded animate-pulse w-1/2"></div>
                                             </div>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>
-                                        <div>
-                                            <div className="font-medium text-primary">{submission.test_name}</div>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>
-                                        <div>
-                                            <div>{submission.submissionDate}</div>
-                                            <div className="text-sm text-muted-foreground">{submission.completed_at}</div>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="text-center">
-                                        {submission.score > 0 ? (
-                                            <Badge
-                                                variant="outline"
-                                                className=" h-8 w-8 text-center text-[16px]   justify-center "
-   
-                                            >
-                                                {submission.score}
-                                            </Badge>
-                                        ) : (
-                                            <Badge variant="outline" className="bg-gray-100">
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="h-4 bg-gray-300 rounded animate-pulse w-3/4"></div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="h-4 bg-gray-300 rounded animate-pulse w-1/2"></div>
+                                        </TableCell>
+                                        <TableCell className="text-center">
+                                            <div className="h-4 bg-gray-300 rounded animate-pulse "></div>
+                                        </TableCell>
+                                        <TableCell className="">
+                                            <div className="h-8 bg-gray-300 rounded animate-pulse"></div>
+                                        </TableCell>
+                                        <TableCell className="">
+                                            <div className="h-8 bg-gray-300 rounded animate-pulse"></div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            ) : (
+                                filteredSubmissions.map((submission) => (
+                                    <TableRow key={submission.id}>
+                                        <TableCell>
+                                            <div className="flex items-center gap-3">
+                                                <User className={`h-8 w-8 bg-gray-300 p-1 rounded-2xl `} />
+                                                <div>
+                                                    <div className="font-medium">{submission.student_name}</div>
+                                                </div>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div>
+                                                <div className="font-medium text-primary">{submission.test_name}</div>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div>
+                                                <div className="text-sm text-muted-foreground">{new Date(submission.completed_at).toLocaleString()}</div>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="text-center">
+                                            {submission.score > 0 ? (
+                                                <Badge
+                                                    variant="outline"
+                                                    className=" h-8 w-8 text-center text-[16px]   justify-center "
+                                                >
+                                                    {submission.score}
+                                                </Badge>
+                                            ) : (
+                                                <Badge variant="outline" className="bg-gray-100">
+                                                    Pending
+                                                </Badge>
+                                            )}
+                                        </TableCell>
+                                        <TableCell className="text-center">
+
+                                            <p
+                                                className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${false ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800" }`}                                            >
                                                 Pending
-                                            </Badge>
-                                        )}
-                                    </TableCell>
-                                    <TableCell className="text-right">
+                                            </p>
 
-                                        <button
-                                            className=" bg-gray-200 border p-2 rounded-[8px]  border-gray-400 "
-                                            onClick={() => handleViewDetails(submission)}
-                                        >
-                                            View Details
-                                        </button>
+                                        </TableCell>
+                                        <TableCell className=" text-center">
 
-                                    </TableCell>
-                                </TableRow>
-                            ))}
+                                            <button
+                                                className=" bg-indigo-500 font-semibold text-white border p-2 rounded-[8px]  border-gray-400 "
+                                                onClick={() => handleViewDetails(submission)}
+                                            >
+                                                View Details
+                                            </button>
+
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            )}
                         </TableBody>
                     </Table>
                     <div className="flex items-center justify-between p-4 border-t">

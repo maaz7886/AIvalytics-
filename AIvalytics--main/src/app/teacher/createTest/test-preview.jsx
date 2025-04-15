@@ -5,7 +5,6 @@ import { CheckCircle, XCircle } from "lucide-react"
 
 export default function TestPreview({
   testTitle,
-  subject,
   topic,
   difficulty,
   questions,
@@ -74,7 +73,6 @@ export default function TestPreview({
     <div className="max-w-3xl  mx-auto">
       <div className="mb-6 text-center">
         <h1 className="text-2xl font-bold mb-2">{testTitle}</h1>
-        {subject && <p className="text-gray-600 mb-1">Subject: {subject}</p>}
         {topic && <p className="text-gray-600 mb-1">Topic: {topic}</p>}
         <p className="text-gray-600">Difficulty: {difficulty}</p>
       </div>

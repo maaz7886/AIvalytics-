@@ -10,6 +10,7 @@ export default function PublishQuizPage() {
   const [selectedClasses, setSelectedClasses] = useState(["CS101", "MATH202"])
   const [selectedStudents, setSelectedStudents] = useState([])
   const [allStudentsSelected, setAllStudentsSelected] = useState(false)
+
   // Retrieve MCQs from localStorage
   const [mcqs, setMcqs] = useState( []);
   useEffect(() => {
@@ -17,9 +18,7 @@ export default function PublishQuizPage() {
     if (storedMcqs) {
       setMcqs(JSON.parse(storedMcqs));
     }
-    console.log('====================================');
-    console.log(JSON.parse(storedMcqs));
-    console.log('====================================');
+   
    
   }, []);
 
@@ -42,25 +41,33 @@ export default function PublishQuizPage() {
     { id: "ECON101", name: "ECON 101", description: "Principles of Economics", students: 35 },
     { id: "PSYCH110", name: "PSYCH 110", description: "Introduction to Psychology", students: 40 },
   ]
+const [students, setStudents] = useState([
+  { id: "1", full_name: "Alex Johnson", class: "MATH202", avatar: "/placeholder.svg?height=40&width=40" },
+  { id: "2", full_name: "Emma Wilson", class: "MATH202", avatar: "/placeholder.svg?height=40&width=40" },
+  { id: "3", full_name: "Michael Brown", class: "CS101", avatar: "/placeholder.svg?height=40&width=40" },
+  { id: "15", full_name: "Mason Wright", class: "BIO110", avatar: "/placeholder.svg?height=40&width=40" },
+])
 
-  // Mock data for students
-  const students = [
-    { id: "1", name: "Alex Johnson", class: "MATH202", avatar: "/placeholder.svg?height=40&width=40" },
-    { id: "2", name: "Emma Wilson", class: "MATH202", avatar: "/placeholder.svg?height=40&width=40" },
-    { id: "3", name: "Michael Brown", class: "CS101", avatar: "/placeholder.svg?height=40&width=40" },
-    { id: "4", name: "Sophia Davis", class: "CS101", avatar: "/placeholder.svg?height=40&width=40" },
-    { id: "5", name: "William Taylor", class: "PHYS101", avatar: "/placeholder.svg?height=40&width=40" },
-    { id: "6", name: "Olivia Martinez", class: "PHYS101", avatar: "/placeholder.svg?height=40&width=40" },
-    { id: "7", name: "James Anderson", class: "ENG205", avatar: "/placeholder.svg?height=40&width=40" },
-    { id: "8", name: "Charlotte Thomas", class: "BIO110", avatar: "/placeholder.svg?height=40&width=40" },
-    { id: "9", name: "Benjamin Harris", class: "CHEM103", avatar: "/placeholder.svg?height=40&width=40" },
-    { id: "10", name: "Amelia Clark", class: "HIST201", avatar: "/placeholder.svg?height=40&width=40" },
-    { id: "11", name: "Lucas Rodriguez", class: "ECON101", avatar: "/placeholder.svg?height=40&width=40" },
-    { id: "12", name: "Mia Lewis", class: "PSYCH110", avatar: "/placeholder.svg?height=40&width=40" },
-    { id: "13", name: "Ethan Walker", class: "CS101", avatar: "/placeholder.svg?height=40&width=40" },
-    { id: "14", name: "Isabella King", class: "MATH202", avatar: "/placeholder.svg?height=40&width=40" },
-    { id: "15", name: "Mason Wright", class: "BIO110", avatar: "/placeholder.svg?height=40&width=40" },
-  ]
+const fetchStudents = async()=>{
+
+  const {data,error}= await supabase
+  .from("students")
+  .select("*")
+  console.log('====================================');
+  console.log(error);
+  console.log('====================================');
+console.log('====================================');
+console.log([...data]);
+console.log('====================================');
+setStudents([...data])
+
+}
+
+useEffect(() => {
+  fetchStudents()
+}, [])
+
+
 
   // Filter classes based on search term
   const filteredClasses = classes.filter(
@@ -72,16 +79,18 @@ export default function PublishQuizPage() {
   // Filter students based on search term and selected classes or viewing class
   const filteredStudents = students.filter((student) => {
     const matchesSearch =
-      student.name.toLowerCase().includes(studentSearchTerm.toLowerCase()) ||
-      student.class.toLowerCase().includes(studentSearchTerm.toLowerCase())
-
+    student.full_name.toLocaleLowerCase().includes(studentSearchTerm.toLowerCase())
+    //  ||
+    // student.class.toLowerCase().includes(studentSearchTerm.toLowerCase())
+    
     // If viewing a specific class, only show students from that class
-    if (viewingClassId) {
-      return matchesSearch && student.class === viewingClassId
-    }
+    // if (viewingClassId) {
+    //   return matchesSearch === viewingClassId
+    // }
 
     // Otherwise show students from all selected classes
-    return matchesSearch && (selectedClasses.length === 0 || selectedClasses.includes(student.class))
+    return matchesSearch 
+    // return matchesSearch && (selectedClasses.length === 0 || selectedClasses.includes(student.class))
   })
 
   // Toggle class selection
@@ -302,6 +311,8 @@ export default function PublishQuizPage() {
             </div>
           </div>
 
+
+
           {/* Students Selection Section */}
           <div>
             {/* Search Students */}
@@ -365,10 +376,10 @@ export default function PublishQuizPage() {
                       <User className=" w-8 h-8 p-1 rounded-full border border-gray-400 "/>
                       <div className="ml-3">
                         <label htmlFor={`student-${student.id}`} className="block font-medium">
-                          {student.name}
+                          {student.full_name}
                         </label>
                         <span className="text-sm text-gray-500">
-                          {classes.find((c) => c.id === student.class)?.name || student.class}
+                          {classes.find((c) => c.id === student.class)?.full_name || student.class}
                         </span>
                       </div>
                     </div>
