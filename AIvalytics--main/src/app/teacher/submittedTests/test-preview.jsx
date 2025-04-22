@@ -20,7 +20,9 @@ export default function TestResultViewer({attemptId}) {
       if (error) throw error
 
       setDisplayQuestions(data)
-      
+      console.log('====================================');
+      console.log("questions ",data);
+      console.log('====================================');
       // Calculate score based on correct answers
       const correctCount = data.filter(
         q => q.selected_answer === q.correct_answer

@@ -45,7 +45,7 @@
     "src/components/teacher_compo/Active_test.jsx",
     "src/app/teacher/publishTest/page.tsx",
     "src/app/authentication/forgot_pass/page.jsx"
-  ],
+, "src/app/reports/page.jsx"  ],
   "exclude": [
     "node_modules"
   ]
