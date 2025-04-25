@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -19,9 +23,30 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/api/models/Mcq_tests.js", "src/lib/mongodb.js", "src/app/api/auth/login/route.js", "src/app/api/student/route.ts", "src/app/student/page.jsx", "src/app/teacher/dashboard/page.jsx", "src/app/authentication/register/page.jsx"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "src/app/api/models/Mcq_tests.js",
+    "src/lib/mongodb.js",
+    "src/app/api/auth/login/route.js",
+    "src/app/api/student/route.ts",
+    "src/app/student/page.jsx",
+    "src/app/teacher/dashboard/page.jsx",
+    "src/app/authentication/register/page.jsx",
+    "src/components/teacher_compo/Sidebar.jsx",
+    "src/components/teacher_compo/Recent_activity.jsx",
+    "src/components/teacher_compo/Active_test.jsx",
+    "src/app/teacher/publishTest/page.tsx",
+    "src/app/authentication/forgot_pass/page.jsx"
+, "src/app/reports/page.jsx"  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

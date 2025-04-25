@@ -24,7 +24,6 @@ export default function StudentDashboard() {
 
   // State for search and filters
   const [searchQuery, setSearchQuery] = useState("")
-  const [subjectFilter, setSubjectFilter] = useState("All Subjects")
 const [test_id, setTest_id] = useState("")
   // State for loading and last synced
   const [loading, setLoading] = useState(true)
@@ -33,9 +32,10 @@ const [test_id, setTest_id] = useState("")
 
   const fetchTests = async () => {
 // Add `.eq()` filter to bypass RLS (temporarily for debugging)
-const { data } = await supabase
+const { data, error } = await supabase
   .from('tests')
   .select('*')
+  .order('created_at', { ascending: false });
 
   setTests(data)
 
@@ -44,38 +44,7 @@ console.log('Test data:', data);
   // Mock data initialization
   useEffect(() => {
       fetchTests()
-    // const mockTests = [
-    //   { id: "1", name: "Physics Mid-Term", subject: "Physics", dueDate: "Dec 15, 2023", status: "Pending" },
-    //   { id: "2", name: "Chemistry Quiz", subject: "Chemistry", dueDate: "Dec 18, 2023", status: "New" },
-    //   { id: "3", name: "Biology Final", subject: "Biology", dueDate: "Dec 20, 2023", status: "Pending" },
-    //   {
-    //     id: "4",
-    //     name: "Mathematics Final",
-    //     subject: "Mathematics",
-    //     dueDate: "Dec 10, 2023",
-    //     status: "Completed",
-    //     score: 92,
-    //     completedOn: "Dec 10, 2023",
-    //   },
-    //   {
-    //     id: "5",
-    //     name: "Biology Quiz",
-    //     subject: "Biology",
-    //     dueDate: "Dec 8, 2023",
-    //     status: "Completed",
-    //     score: 88,
-    //     completedOn: "Dec 8, 2023",
-    //   },
-    //   {
-    //     id: "6",
-    //     name: "Computer Science Project",
-    //     subject: "Computer Science",
-    //     dueDate: "Dec 22, 2023",
-    //     status: "Pending",
-    //   },
-    //   { id: "7", name: "History Essay", subject: "History", dueDate: "Dec 19, 2023", status: "New" },
-    // ]
-
+   
     const mockLeaderboard = [
       { id: "1", name: "Sarah Johnson", averageScore: 95.5, rank: 1 },
       { id: "2", name: "Michael Chen", averageScore: 93.2, rank: 2 },
@@ -90,21 +59,19 @@ console.log('Test data:', data);
 
   // Function to handle search and filtering
   useEffect(() => {
-    const availableTests = tests.filter((test) => test.status !== "Completed")
+    const availableTests = tests
 
-    if (searchQuery || subjectFilter !== "All Subjects") {
+    if (searchQuery) {
       const filtered = availableTests.filter((test) => {
         const matchesSearch =
-          test.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          test.subject.toLowerCase().includes(searchQuery.toLowerCase())
-        const matchesSubject = subjectFilter === "All Subjects" || test.subject === subjectFilter
-        return matchesSearch && matchesSubject
+          test.Title.toLowerCase().includes(searchQuery.toLowerCase())
+        return matchesSearch 
       })
       setFilteredTests(filtered)
     } else {
       setFilteredTests(availableTests)
     }
-  }, [searchQuery, subjectFilter, tests])
+  }, [searchQuery, tests])
 
   // Function to refresh data
   const refreshData = () => {

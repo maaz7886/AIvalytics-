@@ -1,52 +1,61 @@
 "use client"
 import { useRouter, useSearchParams } from "next/navigation"
-import type React from "react"
+import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase/client"
-import { useState } from "react"
 import Link from "next/link"
 import { Check } from "lucide-react"
 
-export default function LoginPage() {
+export default function LoginFormPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [rememberMe, setRememberMe] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
-  const role = searchParams.get("role") || "students" // Default to student if no role specified
+  const role = searchParams.get("role") || "students"
 
-  const handleLogin = async (e: React.FormEvent) => {
+  // Check auth status only after component mounts
+  useEffect(() => {
+    setIsMounted(true)
+    const authData = localStorage.getItem(`Auth${role}`)
+    if (authData) {
+      router.push(role === "teachers" ? "/teacher/dashboard" : "/student")
+    }
+  }, [role, router])
+
+  const handleLogin = async (e) => {
     e.preventDefault()
+    if (!isMounted) return
+    
     setLoading(true)
 
     try {
-      // Fetch user data from Supabase
       const { data: user, error } = await supabase
-        .from(role) // Assuming your table is named based on the role
+        .from(role)
         .select('*')
         .eq('email', email)
-        .single();
+        .single()
 
-      if (error || !user) {
-        console.error("User not found:", error);
-        return; // Handle user not found
-      }
+      if (error || !user) throw new Error("User not found")
+      if (user.password !== password) throw new Error("Invalid password")
 
-      // Compare the password (make sure to hash the password when storing it)
-      if (user.password !== password) {
-        console.error("Invalid password");
-        return; // Handle invalid password
-      }
-
-      // If login is successful
-      console.log("Redirecting...", user);
-      localStorage.setItem(`Auth${role}`, JSON.stringify(user));
-      router.push(role === "teachers" ? "/teacher/dashboard" : "/student");
+      localStorage.setItem(`Auth${role}`, JSON.stringify(user))
+      router.push(role === "teachers" ? "/teacher/dashboard" : "/student")
     } catch (error) {
-      console.error("Login error:", error);
+      console.error("Login error:", error)
+      alert(error.message)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
+  }
+
+  if (!isMounted) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
+      </div>
+    )
   }
 
   return (

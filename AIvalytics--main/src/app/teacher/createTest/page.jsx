@@ -1,22 +1,23 @@
 "use client"
 
 
-import { useRouter } from 'next/navigation';
 import { useState } from "react"
 import { Trash2, Plus, Wand2, X } from "lucide-react"
 import TestPreview from "./test-preview"
+import PublishModal from './publish-modal';
+import { supabase } from '@/lib/supabase/client';
+import { set } from "mongoose";
 
 export default function MCQGenerator() {
 
-    const router = useRouter();
 
     const [testTitle, setTestTitle] = useState("")
-    const [subject, setSubject] = useState("")
     const [topic, setTopic] = useState("")
     const [difficulty, setDifficulty] = useState("Easy")
     const [studentClass, setStudentClass] = useState("SYBCA-A")
     const [noOfQue, setNoOfQue] = useState("5")
     const [randomizeQuestions, setRandomizeQuestions] = useState(false)
+    const [isModalOpen, setIsModalOpen] = useState(false)
 
 
     const [mcqs, setMcqs] = useState([])
@@ -31,7 +32,7 @@ export default function MCQGenerator() {
             const response = await fetch("/api/generate-mcqs", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ topic, difficulty, noOfQue,testTitle }),
+                body: JSON.stringify({ topic, difficulty, noOfQue, testTitle }),
             })
             const data = await response.json()
             setMcqs((pre) => [...data.mcqs, ...pre])
@@ -80,18 +81,66 @@ export default function MCQGenerator() {
         setMcqs(updatedMcqs)
     }
 
-    const saveTest = () => {
-        // Implement save functionality
-        router.push('/teacher/publishTest')
-        localStorage.removeItem('mcqs')
-        // Save MCQs to local storage for now
-      localStorage.setItem('mcqs', JSON.stringify(mcqs));
-
-    }
+  
 
     const togglePreview = () => {
         setShowPreview(!showPreview)
     }
+
+
+    const publishTest = async () => {
+            try {
+              // 1. First insert all questions
+              
+              const { data: questionsData, error: insertError } = await supabase
+                .from('questions')
+                .insert(mcqs)
+                .select('id, created_at');
+          
+              if (insertError) {
+                console.error('Question insertion error details:', insertError);
+                throw new Error(`Failed to insert questions: ${insertError.message}`);
+              }
+          
+              // 2. Check if questions were actually inserted
+              if (!questionsData || questionsData.length === 0) {
+                throw new Error('No questions were inserted - check your data');
+              }
+          
+              // 3. Attempt to create test
+              const { data, error } = await supabase
+              .rpc('create_tests_in_batches');
+
+            if (error) throw error;
+            
+            if (data) {
+              alert(`Successfully created tests! `);
+            } else {
+              alert('No tests created - need at least 5 unused questions');
+            }
+            setMcqs([])
+            setTestTitle("")
+            setTopic("")
+            setDifficulty("Easy")
+            setStudentClass("SYBCA-A")
+            setNoOfQue("5")
+            setRandomizeQuestions(false)
+            setLoading(false)
+            setShowPreview(false)
+            
+
+        // setIsModalOpen(true)
+
+
+            } catch (err) {
+              // Proper error formatting
+              const errorMessage = err instanceof Error ? err.message : JSON.stringify(err);
+              console.error('Full publish error:', err);
+              alert(`❌ Publish failed: ${errorMessage}`);
+            }
+          };
+
+
 
     return (
         <div className="max-w-7xl mx-auto p-6 ">
@@ -203,7 +252,7 @@ export default function MCQGenerator() {
                                 Preview
                             </button>
                             <button
-                                onClick={() => saveTest()}
+                                onClick={() => publishTest()}
                                 className="px-4 py-2 bg-emerald-500 text-white rounded hover:bg-emerald-600 transition"
                             >
                                 Publish Test
@@ -286,7 +335,6 @@ export default function MCQGenerator() {
                         <div className="p-6">
                             <TestPreview
                                 testTitle={testTitle || "Untitled Test"}
-                                subject={subject}
                                 topic={topic}
                                 difficulty={difficulty}
                                 questions={mcqs}
@@ -301,6 +349,9 @@ export default function MCQGenerator() {
                     </div>
                 </div>
             )}
+
+            {/* {isModalOpen && <PublishModal onClose={() => setIsModalOpen(false)} />} */}
+
         </div>
     )
 }

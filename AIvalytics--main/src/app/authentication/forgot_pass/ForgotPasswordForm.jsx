@@ -1,19 +1,17 @@
 "use client"
-import { useSearchParams } from "next/navigation"
-import type React from "react"
 
+import { useSearchParams } from "next/navigation"
 import { useState } from "react"
 import Link from "next/link"
 
-export default function ForgotPasswordPage() {
+export default function ForgotPasswordForm() {
   const [email, setEmail] = useState("")
   const [submitted, setSubmitted] = useState(false)
   const searchParams = useSearchParams()
-  const role = searchParams.get("role") || "teacher" // Default to teacher if no role specified
+  const role = searchParams.get("role") || "teacher"
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e) => {
     e.preventDefault()
-    // Handle password reset logic here
     console.log({ email, role })
     setSubmitted(true)
   }
@@ -88,4 +86,3 @@ export default function ForgotPasswordPage() {
     </div>
   )
 }
-
