@@ -52,10 +52,15 @@
 
 
 
-import { Bell, Book, User } from "lucide-react";
+import { Bell, Book, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const TopNavBar = ({ name }: { name: string }) => {
+  const handleLogout = () => {
+    localStorage.removeItem('Authstudents');
+    window.location.href = '/';
+  };
+
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -70,13 +75,23 @@ const TopNavBar = ({ name }: { name: string }) => {
             <Bell className="h-5 w-5" />
           </Button>
         
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
-              <User className="h-5 w-5 text-gray-500" />
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+                <User className="h-5 w-5 text-gray-500" />
+              </div>
+              <div className="hidden md:block">
+                <span className="text-sm font-medium">{name}</span>
+              </div>
             </div>
-            <div className="hidden md:block">
-              <span className="text-sm font-medium">{name}</span>
-            </div>
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={handleLogout}
+              className="text-gray-600 hover:text-red-600 hover:bg-red-50"
+            >
+              <LogOut className="h-5 w-5" />
+            </Button>
           </div>
         </div>
       </div>

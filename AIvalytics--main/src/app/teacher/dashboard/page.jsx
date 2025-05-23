@@ -4,9 +4,11 @@ import Infobar_top from "@/components/teacher_compo/Infobar_top";
 import Active_test from "@/components/teacher_compo/Active_test";
 import Recent_activity from "@/components/teacher_compo/Recent_activity";
 import { useEffect, useState } from "react";
+import { useRouter } from 'next/navigation';
 
 export default function Dashboard() {
     const [teacher, setTeacher] = useState(null); // Initialize with null
+    const router = useRouter();
 
     useEffect(() => {
         const teacherData = localStorage.getItem('Authteachers');
@@ -16,6 +18,12 @@ export default function Dashboard() {
             setTeacher(parsedData);
         }
     }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem('Authteachers'); // Remove teacher data from localStorage
+        setTeacher(null); // Clear teacher state
+        router.push('/'); // Redirect to login page
+    };
 
     return (
         <div className="flex min-h-screen bg-gray-50">
@@ -39,6 +47,12 @@ export default function Dashboard() {
                                             className="object-cover"
                                         />
                                     </div>
+                                    <button
+                                        onClick={handleLogout}
+                                        className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors"
+                                    >
+                                        Logout
+                                    </button>
                                 </>
                             )}
                         </div>

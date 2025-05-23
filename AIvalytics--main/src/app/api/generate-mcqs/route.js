@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 
 export async function POST(request) {
     try {
-        const { topic,difficulty,noOfQue, testTitle } = await request.json();
+        const { topic, difficulty, noOfQue, testTitle } = await request.json();
 
         if (!topic || !noOfQue || !testTitle) {
             return NextResponse.json(
@@ -12,40 +11,102 @@ export async function POST(request) {
             );
         }
 
-        // Verify Google API key is present
-        if (!process.env.GOOGLE_API_KEY) {
-            console.error("Google API key is missing");
+        // Verify OpenRouter API key is present
+        if (!process.env.OPENROUTER_API_KEY) {
+            console.error("OpenRouter API key is missing");
             return NextResponse.json(
                 { error: "Server configuration error" },
                 { status: 500 }
             );
         }
 
-        const llm = new ChatGoogleGenerativeAI({
-            model: "gemini-1.5-pro",
-            apiKey: process.env.GOOGLE_API_KEY, // Explicitly pass the API key
-            temperature: 0.7, // Reduced from 2 (2 is too high)
-            maxRetries: 2,
+        const systemPrompt = "You are a specialized MCQ generator that only outputs valid JSON arrays containing multiple choice questions. Never include any additional text or explanations outside the JSON structure.";
+        
+        const userPrompt = `Create ${noOfQue} multiple choice questions about ${topic} at ${difficulty || "easy"} difficulty level. Format as JSON array:
+[{
+  "Title": "${testTitle}",
+  "question": "brief question",
+  "options": ["brief1", "brief2", "brief3", "brief4"],
+  "correctAnswer": "exact match from options",
+  "explanation": "very brief explanation"
+}]`;
+
+        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+                "HTTP-Referer": process.env.SITE_URL || "http://localhost:3000",
+                "X-Title": "AIvalytics MCQ Generator"
+            },
+            body: JSON.stringify({
+                model: "deepseek/deepseek-prover-v2:free",
+                messages: [
+                    { role: "system", content: systemPrompt },
+                    { role: "user", content: userPrompt }
+                ],
+                temperature: 0.5,
+                max_tokens: 1500,
+                top_p: 0.9,
+                frequency_penalty: 0.0,
+                presence_penalty: 0.0
+            })
         });
 
-        const prompt = `Generate ${noOfQue} multiple-choice questions (MCQs) on the topic "${topic}" & difficulty ${difficulty?difficulty:"easy"}. 
-        Each MCQ should have 4 options,and also make  sure the correctAnswer have to be in random order not always, one correct answer, and a brief explanation of the correct answer.
-        Provide the response in a clean, minified JSON array format without additional text or comments. in format dont chage the Title value it will be constant as i provided
-        Ensure valid JSON format: 
-        [
-          {"Title":${testTitle},"question": "...", "options": ["...", "...", "...", "..."], "correctAnswer": "...", "explanation": "..."},
-          ...
-        ]`;
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error?.message || 'Failed to generate MCQs');
+        }
 
-        const aiResponse = await llm.invoke([["human", prompt]]);
-        // console.log(aiResponse.content)
+        const aiResponse = await response.json();
+        console.log("Raw AI Response:", JSON.stringify(aiResponse, null, 2));
+        
         let mcqs;
+        
         try {
-            const jsonString = aiResponse.content.trim().replace(/```json|```/g, "");
-            mcqs = JSON.parse(jsonString);
+            // Get the raw content and handle potential JSON formatting
+            const rawContent = aiResponse.choices[0].message.content;
+            console.log("Raw content:", rawContent);
+
+            if (!rawContent) {
+                throw new Error('Empty response from AI');
+            }
+
+            // Try to extract just the JSON array part
+            const jsonMatch = rawContent.match(/\[[\s\S]*\]/);
+            if (!jsonMatch) {
+                // If no array found, try parsing the raw content directly
+                mcqs = JSON.parse(rawContent);
+            } else {
+                const jsonString = jsonMatch[0]
+                    .replace(/\n/g, ' ')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+                
+                console.log("Extracted JSON string:", jsonString);
+                mcqs = JSON.parse(jsonString);
+            }
+
+            // Validate MCQ format
+            if (!Array.isArray(mcqs)) {
+                throw new Error('Response is not an array');
+            }
+
+            // Validate each MCQ
+            mcqs.forEach((mcq, index) => {
+                if (!mcq.Title || !mcq.question || !Array.isArray(mcq.options) || 
+                    mcq.options.length !== 4 || !mcq.correctAnswer || !mcq.explanation) {
+                    throw new Error(`Invalid MCQ format at index ${index}`);
+                }
+            });
+
         } catch (jsonError) {
             console.error("JSON Parsing Error:", jsonError);
-            return NextResponse.json({ error: "Failed to parse AI response as JSON" }, { status: 500 });
+            return NextResponse.json({ 
+                error: "Failed to parse AI response as JSON",
+                details: jsonError.message,
+                rawContent: aiResponse.choices[0].message.content
+            }, { status: 500 });
         }
 
         return NextResponse.json({ mcqs });
@@ -64,11 +125,6 @@ export async function POST(request) {
             { status: 500 }
         );
     }
-
-
-
-
-
 }
 
 

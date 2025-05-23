@@ -23,6 +23,7 @@ export default function MCQGenerator() {
     const [mcqs, setMcqs] = useState([])
     const [loading, setLoading] = useState(false)
     const [showPreview, setShowPreview] = useState(false)
+    const [isPublishing, setIsPublishing] = useState(false)
 
     const fetchMCQs = async () => {
         if (!testTitle || !topic) return
@@ -88,8 +89,36 @@ export default function MCQGenerator() {
     }
 
 
+    const PublishingOverlay = () => (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-white p-8 rounded-lg shadow-xl flex flex-col items-center space-y-6 max-w-md w-full mx-4">
+                <div className="relative">
+                    <div className="w-20 h-20 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                        <svg className="w-10 h-10 text-emerald-500" fill="none" viewBox="0 0 24 24">
+                            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+                            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2"/>
+                            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6"/>
+                            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 16h6"/>
+                        </svg>
+                    </div>
+                </div>
+                <div className="text-center space-y-3">
+                    <h3 className="text-xl font-semibold text-gray-900">Publishing Test</h3>
+                    <p className="text-gray-600">Please wait while we save your test and prepare it for your students...</p>
+                </div>
+                <div className="flex space-x-2 items-center">
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce"></div>
+                </div>
+            </div>
+        </div>
+    );
+
     const publishTest = async () => {
             try {
+              setIsPublishing(true);
               // 1. First insert all questions
               
               const { data: questionsData, error: insertError } = await supabase
@@ -137,221 +166,247 @@ export default function MCQGenerator() {
               const errorMessage = err instanceof Error ? err.message : JSON.stringify(err);
               console.error('Full publish error:', err);
               alert(`❌ Publish failed: ${errorMessage}`);
+            } finally {
+              setIsPublishing(false);
             }
           };
 
-
+    const LoadingOverlay = () => (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-white p-8 rounded-lg shadow-xl flex flex-col items-center space-y-4">
+                <div className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                <div className="text-center space-y-2">
+                    <h3 className="text-lg font-semibold text-gray-900">Generating Questions</h3>
+                    <p className="text-gray-500 text-sm">Using AI to create high-quality MCQs...</p>
+                </div>
+                <div className="flex space-x-2 items-center mt-2">
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce"></div>
+                </div>
+            </div>
+        </div>
+    );
 
     return (
-        <div className="max-w-7xl mx-auto p-6 ">
-            <h1 className="text-3xl font-bold mb-6">Create New Test</h1>
+        <div className="min-h-screen bg-gray-50 py-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                {loading && <LoadingOverlay />}
+                {isPublishing && <PublishingOverlay />}
+                
+                <div className="mb-8">
+                    <h1 className="text-4xl font-bold text-gray-900">Create New Test</h1>
+                    <p className="mt-2 text-gray-600">Design your test questions and configure test settings</p>
+                </div>
 
-            <div className=" gap-6">
-                <div className=" space-y-6">
-                    <div className="bg-white p-6 rounded-lg border border-gray-300 shadow-sm">
-                        <div className=" flex gap-4 mb-6">
-                            <div className=" flex-1/2">
-                                <label className="block text-sm font-medium mb-1">Test Title</label>
-                                <input
-                                    type="text"
-                                    value={testTitle}
-                                    onChange={(e) => setTestTitle(e.target.value)}
-                                    placeholder="Enter test title"
-                                    className="w-full p-2 border border-gray-300 rounded"
-                                />
+                <div className="space-y-6">
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        <div className="p-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                                <div className="col-span-1 md:col-span-2 lg:col-span-1">
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Test Title</label>
+                                    <input
+                                        type="text"
+                                        value={testTitle}
+                                        onChange={(e) => setTestTitle(e.target.value)}
+                                        placeholder="Enter test title"
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Difficulty Level</label>
+                                    <select
+                                        value={difficulty}
+                                        onChange={(e) => setDifficulty(e.target.value)}
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all appearance-none bg-white"
+                                    >
+                                        <option value="Easy">Easy</option>
+                                        <option value="Medium">Medium</option>
+                                        <option value="Hard">Hard</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Student Class</label>
+                                    <select
+                                        value={studentClass}
+                                        onChange={(e) => setStudentClass(e.target.value)}
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all appearance-none bg-white"
+                                    >
+                                        <option value="SYBCA-C">SYBCA-C</option>
+                                        <option value="SYMCA-B">SYMCA-B</option>
+                                        <option value="SYMCA-C">SYMCA-C</option>
+                                        <option value="FYBCA-A">FYBCA-A</option>
+                                        <option value="FYBCA-B">FYBCA-B</option>
+                                        <option value="TYBCA-A">TYBCA-A</option>
+                                        <option value="TYBCA-B">TYBCA-B</option>
+                                        <option value="TYMCA-A">TYMCA-A</option>
+                                    </select>
+                                </div>
                             </div>
 
-                            {/* Difficulty */}
-                            <div className=" flex-1/4">
-                                <label className="block text-sm font-medium mb-1">Difficulty Level</label>
-                                <select
-                                    value={difficulty}
-                                    onChange={(e) => setDifficulty(e.target.value)}
-                                    className="w-full p-2 border border-gray-300 rounded"
-                                >
-                                    <option value="Easy">Easy</option>
-                                    <option value="Medium">Medium</option>
-                                    <option value="Hard">Hard</option>
-                                </select>
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Topic</label>
+                                    <textarea
+                                        value={topic}
+                                        onChange={(e) => setTopic(e.target.value)}
+                                        placeholder="Enter the topic for question generation..."
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all min-h-[100px]"
+                                    />
+                                </div>
+
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center space-x-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Number of Questions</label>
+                                            <select
+                                                value={noOfQue}
+                                                onChange={(e) => setNoOfQue(e.target.value)}
+                                                className="w-32 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all appearance-none bg-white"
+                                            >
+                                                <option value="5">5</option>
+                                                <option value="10">10</option>
+                                                <option value="15">15</option>
+                                                <option value="20">20</option>
+                                            </select>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input
+                                                type="checkbox"
+                                                id="randomize"
+                                                checked={randomizeQuestions}
+                                                onChange={(e) => setRandomizeQuestions(e.target.checked)}
+                                                className="w-4 h-4 text-blue-500 border-gray-300 rounded focus:ring-blue-500"
+                                            />
+                                            <label htmlFor="randomize" className="text-sm text-gray-700">Randomize Questions</label>
+                                        </div>
+                                    </div>
+                                    <div className="flex space-x-4">
+                                        <button
+                                            onClick={fetchMCQs}
+                                            className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all"
+                                        >
+                                            <Wand2 className="h-5 w-5 mr-2" />
+                                            Generate Questions
+                                        </button>
+                                        <button
+                                            onClick={addQuestion}
+                                            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all"
+                                        >
+                                            <Plus className="h-5 w-5 mr-2" />
+                                            Add Question
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-
-                            {/* Difficulty */}
-                            <div className=" flex-1/4">
-                                <label className="block text-sm font-medium mb-1">Student classes</label>
-                                <select
-                                    value={studentClass}
-                                    onChange={(e) => setStudentClass(e.target.value)}
-                                    className="w-full p-2 border border-gray-300 rounded"
-                                >
-                                    <option value="SYBCA-C">SYBCA-C</option>
-                                    <option value="SYMCA-B">SYMCA-B</option>
-                                    <option value="SYMCA-C">SYMCA-C</option>
-                                    <option value="FYBCA-A">FYBCA-A</option>
-                                    <option value="FYBCA-B">FYBCA-B</option>
-                                    <option value="TYBCA-A">TYBCA-A</option>
-                                    <option value="TYBCA-B">TYBCA-B</option>
-                                    <option value="TYMCA-A">TYMCA-A</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div className="mb-6">
-                            <label className="block text-sm font-medium mb-1">Topic</label>
-                            <textarea
-                                value={topic}
-                                onChange={(e) => setTopic(e.target.value)}
-                                placeholder="Enter topic"
-                                rows={5}
-                                className="w-full p-2 border border-gray-300 rounded resize-none"
-                            />
-                        </div>
-                        <div className="flex gap-x-5 justify-between pl-1">
-                            <div className="flex items-center gap-2">
-                                <input
-                                    type="checkbox"
-                                    id="randomize"
-                                    checked={randomizeQuestions}
-                                    onChange={(e) => setRandomizeQuestions(e.target.checked)}
-                                    className="w-4 h-4"
-                                />
-                                <label htmlFor="randomize">Randomize questions</label>
-                            </div>
-
-
-                            <div className=" ">
-                                <label className="block text-sm font-medium mb-1">no. of Question's</label>
-                                <select
-                                    value={noOfQue}
-                                    onChange={(e) => setNoOfQue(e.target.value)}
-                                    className="w-full p-2 border border-gray-300 rounded"
-                                >
-                                    <option value="5">5</option>
-                                    <option value="10">10</option>
-                                    <option value="15">15</option>
-
-                                </select>
-                            </div>
-
-
-                            <button
-                                onClick={fetchMCQs}
-                                disabled={!topic || !testTitle}
-                                className="flex items-center gap-1 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded disabled:opacity-50 transition"
-                            >
-                                <Wand2 className="w-4 h-4" />
-                                <span>{loading ? "Generating..." : "Generate with AI"}</span>
-                            </button>
-                            <button
-                                onClick={addQuestion}
-                                className="flex items-center gap-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition"
-                            >
-                                <Plus className="w-4 h-4" />
-                                <span>Add Question</span>
-                            </button>
-                            <button onClick={togglePreview} className="px-6 py-2 border border-gray-300 rounded hover:bg-gray-50 transition">
-                                Preview
-                            </button>
-                            <button
-                                onClick={() => publishTest()}
-                                className="px-4 py-2 bg-emerald-500 text-white rounded hover:bg-emerald-600 transition"
-                            >
-                                Publish Test
-                            </button>
                         </div>
                     </div>
 
-                    <div className="bg-white w-full p-6  rounded-lg border border-gray-300 shadow-sm">
-                        <div className="flex justify-center w-full items-center mb-4">
-                            <h2 className="text-xl font-semibold border-b border-gray-400">Questions</h2>
-
-                        </div>
-                        <div className="flex  flex-wrap gap-6  justify-center ">
-
-                            {mcqs.map((mcq, questionIndex) => (
-                                <div key={questionIndex} className=" sm:w-[31%] p-4 border  border-gray-300 rounded-lg relative">
-                                    <button
-                                        onClick={() => removeQuestion(questionIndex)}
-                                        className="absolute top-2 right-2 text-gray-500 hover:text-red-500"
-                                    >
-                                        <Trash2 className="w-5 h-5" />
-                                    </button>
-
-                                    <div className="mb-4">
-                                        <label className="block text-sm font-medium mb-1">Question {questionIndex + 1}</label>
-                                        <textarea
-                                            value={mcq.question}
-                                            onChange={(e) => updateQuestion(questionIndex, "question", e.target.value)}
-                                            placeholder="Enter question"
-                                            className="w-full p-2 border border-gray-300 rounded"
-                                            rows={3}
-                                        />
+                    {mcqs.length > 0 && (
+                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                            <div className="p-6">
+                                <div className="flex justify-between items-center mb-6">
+                                    <h2 className="text-xl font-semibold text-gray-900">Questions</h2>
+                                    <div className="flex space-x-4">
+                                        <button
+                                            onClick={togglePreview}
+                                            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all"
+                                        >
+                                            {showPreview ? "Edit Questions" : "Preview Test"}
+                                        </button>
+                                        <button
+                                            onClick={publishTest}
+                                            className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all"
+                                        >
+                                            Publish Test
+                                        </button>
                                     </div>
+                                </div>
 
-                                    <div className="space-y-3">
-                                        {mcq.options.map((option, optionIndex) => (
-                                            <div key={optionIndex} className="flex items-center gap-2">
-                                                <input
-                                                    type="radio"
-                                                    name={`correct-${questionIndex}`}
-                                                    checked={mcq.correctAnswer === option && option !== ""}
-                                                    onChange={() => setCorrectAnswer(questionIndex, option)}
-                                                    disabled={option === ""}
-                                                    className="w-4 h-4"
+                                {showPreview ? (
+                                    <div 
+                                        className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+                                        onClick={(e) => {
+                                            // Only close if clicking the backdrop
+                                            if (e.target === e.currentTarget) {
+                                                togglePreview();
+                                            }
+                                        }}
+                                    >
+                                        <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+                                            <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+                                                <h2 className="text-2xl font-bold text-gray-900">Test Preview</h2>
+                                                <button
+                                                    onClick={togglePreview}
+                                                    className="p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100 transition-all"
+                                                >
+                                                    <X className="h-5 w-5" />
+                                                </button>
+                                            </div>
+                                            <div className="p-6 overflow-y-auto">
+                                                <TestPreview
+                                                    testTitle={testTitle}
+                                                    topic={topic}
+                                                    difficulty={difficulty}
+                                                    questions={mcqs}
+                                                    randomizeQuestions={randomizeQuestions}
                                                 />
-                                                <input
-                                                    type="text"
-                                                    value={option}
-                                                    onChange={(e) => updateOption(questionIndex, optionIndex, e.target.value)}
-                                                    placeholder={`Option ${optionIndex + 1}`}
-                                                    className="flex-1 p-2 border border-gray-300 rounded"
-                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {mcqs.map((mcq, index) => (
+                                            <div key={index} className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                                                <div className="flex justify-between items-start mb-4">
+                                                    <h3 className="text-lg font-medium text-gray-900">Question {index + 1}</h3>
+                                                    <button
+                                                        onClick={() => removeQuestion(index)}
+                                                        className="p-1.5 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-full transition-all"
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </button>
+                                                </div>
+                                                <div className="space-y-4">
+                                                    <textarea
+                                                        value={mcq.question}
+                                                        onChange={(e) => updateQuestion(index, "question", e.target.value)}
+                                                        placeholder="Enter your question"
+                                                        className="w-full p-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                                        rows="3"
+                                                    />
+                                                    <div className="space-y-3">
+                                                        {mcq.options.map((option, optionIndex) => (
+                                                            <div key={optionIndex} className="flex items-center space-x-2">
+                                                                <input
+                                                                    type="radio"
+                                                                    name={`correct-${index}`}
+                                                                    checked={mcq.correctAnswer === option}
+                                                                    onChange={() => setCorrectAnswer(index, option)}
+                                                                    className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                                                                />
+                                                                <input
+                                                                    type="text"
+                                                                    value={option}
+                                                                    onChange={(e) => updateOption(index, optionIndex, e.target.value)}
+                                                                    placeholder={`Option ${optionIndex + 1}`}
+                                                                    className="flex-1 p-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                                                />
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
                                             </div>
                                         ))}
                                     </div>
-                                </div>
-                            ))}
+                                )}
+                            </div>
                         </div>
-
-                    </div>
+                    )}
                 </div>
-
             </div>
-
-            <div className="flex justify-end gap-3 mt-6">
-
-            </div>
-
-            {/* Preview Modal */}
-            {showPreview && (
-                <div
-                    className="fixed inset-0 bg-transparent backdrop-blur-md  flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-l border   shadow-lg w-full max-w-4xl max-h-[90vh] overflow-auto">
-                        <div className="flex  justify-between items-center p-4 border-b border-gray-300-b">
-                            <h2 className="text-xl font-bold">Test Preview</h2>
-                            <button onClick={togglePreview} className="text-gray-500 hover:text-gray-700">
-                                <X className="w-6 h-6" />
-                            </button>
-                        </div>
-                        <div className="p-6">
-                            <TestPreview
-                                testTitle={testTitle || "Untitled Test"}
-                                topic={topic}
-                                difficulty={difficulty}
-                                questions={mcqs}
-                                randomizeQuestions={randomizeQuestions}
-                            />
-                        </div>
-                        <div className="p-4 border-t border-gray-300-t flex justify-end">
-                            <button onClick={togglePreview} className="px-4 py-2  border border-gray-400 rounded hover:bg-gray-200 transition">
-                                Close Preview
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* {isModalOpen && <PublishModal onClose={() => setIsModalOpen(false)} />} */}
-
         </div>
     )
 }
